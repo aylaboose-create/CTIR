@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTIR</title>
+
+    <!-- ============================================
+         GOOGLE FONTS
+         - To change fonts, visit fonts.google.com
+         - Replace the font names in the URL and in style.css
+         ============================================ -->
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter+Tight:wght@300;400;500;600;700;900&family=Source+Serif+4:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <!-- ============================================
+         NAVIGATION: Fixed header with mobile toggle
+         - Change the nav links to match your story sections
+         - The hamburger menu appears on screens under 768px
+         ============================================ -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><img src="img/Artboard 1.png" /></div>
+            <button class="hamburger" onclick="toggleNav()">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="index.html">Home</a></li>
+                <li><a href="projects.html">Projects</a></li>
+                <li><a href="about.html">About</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ============================================
+         HERO SECTION: Full-screen image + headline
+         - Change the background image in style.css
+         - Look for ".hero" in the CSS file
+         - Edit the headline and deck text below
+         ============================================ -->
+    <section id="hero" class="hero">
+        <p class="byline">Ayla Boose | May, 2026</p>
+        <img src="img/finalelements.png" class="hero-elements" alt="">
+        <p class="deck">Cal Poly Students are mapping out how the Central Coast is changing - one tide at a time</p>
+        <h1>Coastal Tide Impact Research</h1>
+        <p class="scroll-hint">Scroll to discover more ↓</p>
+    </section>
+
+    <!-- ============================================
+         STORY TEXT SECTION
+         - Write your full story here
+         - Use multiple <p> tags for multiple paragraphs
+         ============================================ -->
+    <section class="section story-text">
+        <p class="lead">For some, sea level rise might be a distant thing. In the face of climate change, as sea levels rise, their effects are beginning to reach inland to coastal communities. What we are doing to the planet is starting to make noticeable changes. Sea level rise has led to increased flooding, urban blockages and sediment build up in our estuaries and bays. We’ve seen this firsthand in the annual flooding of Toro Creek Bridge, Morro Bay State Park and other locations in San Luis Obispo. These effects of sea level rise will become increasingly drastic and more common as climate change continues. It’s key that we begin tackling how to not only continue to design our infrastructures, but record what tides look like and the ways they can reflect our human impacts on the planet. </p>
+        <span class="eyebrow">The Problem</span>
+        <h2>Tide Gauges in California are about 100 miles apart. That’s Not Enough. </h2>
+        <p>NOAA (National Oceanic and Atmospheric Administration) specializes in collecting data on all things environmental, including tide levels. However, gauges are sparsely located with one every 100 miles or so. With a price point of $25,000 dollars (aside from installation costs) NOAA gauges leave gaps of information along our coast, masking the reality of how sea rise is affecting coastal communities now and will continue to in the future. CTIR aims to fix that.  </p>
+        <p>Using tide gauges, or devices that simply measure water levels and temperature, CTIR collects information of how water around SLO moves, how it’s affecting us, and how we can work with our land and community to create solutions.</p>
+         <blockquote>”This project offers an ability to get across a message to people about how their shorelines might change in the future, and how we might have to alter how we interact with the shorelines.”
+            - Dr. Serena Lee Physical Oceanographer and former research fellow with CTIR at Cal Poly San Luis Obispo
+</blockquote>
+
+    <!-- Audio section moved here, below first blockquote -->
+    <section id="audio" class="section alt-bg">
+        <h2>What are Tide Gauges?</h2>
+        <p class="section-intro">To give more insight on our gauges, we've asked the CTIR team to help explain how they work and their importance.</p>
+
+        <!-- Hidden audio elements — triggered by clicking the images below -->
+        <audio id="audio_1"><source src="audio/hobogauge.m4a" type="audio/mp4"></audio>
+        <audio id="audio_2"><source src="audio/radargauge.aac" type="audio/aac"></audio>
+        <audio id="audio_3"><source src="audio/3.mp3" type="audio/mpeg"></audio>
+
+
+
+        <div class="audio-board">
+            <div class="audio-speaker">
+                <img src="img/rollover/1.gif" class="rollover" alt="Speaker 1 name"
+                    onmouseover="this.src='img/rollover/1.jpg'"
+                    onmouseout="this.src='img/rollover/1.gif'"
+                    onclick="document.getElementById('audio_1').play(); return false;"
+                    ondblclick="document.getElementById('audio_1').pause(); return false;">
+                <p class="audio-label">HOBO Gauge</p>
+            </div>
+            <div class="audio-speaker">
+                <img src="img/rollover/2.gif" class="rollover" alt="Speaker 2 name"
+                    onmouseover="this.src='img/rollover/2.jpg'"
+                    onmouseout="this.src='img/rollover/2.gif'"
+                    onclick="document.getElementById('audio_2').play(); return false;"
+                    ondblclick="document.getElementById('audio_2').pause(); return false;">
+                <p class="audio-label">Radar Gauge</p>
+            </div>
+            <div class="audio-speaker">
+                <img src="img/rollover/3.gif" class="rollover" alt="Speaker 3 name"
+                    onmouseover="this.src='img/rollover/3.jpg'"
+                    onmouseout="this.src='img/rollover/3.gif'"
+                    onclick="document.getElementById('audio_3').play(); return false;"
+                    ondblclick="document.getElementById('audio_3').pause(); return false;">
+                <p class="audio-label">Speaker Name</p>
+            </div>
+        </div>
+        <p class="audio-instructions">Click an image to play &nbsp;|&nbsp; Double-click to pause</p>
+    </section>
+
+<!-- ============================================
+         PARALLAX DIVIDER
+         - Change the background image in style.css
+         - Look for ".parallax-1"
+         ============================================ -->
+    <div class="parallax-divider parallax-1" aria-hidden="true"></div>
+<span class="eyebrow">Origin Story</span>
+<h2>It Started with One Student and an Idea.</h2>
+        <p>When masters student Alex Dunn first joined the project, he fully committed his time to figuring out what made tide gauges tick. No one really knows how he figured out all the nitty gritty details of making a tide gauge, but he did. With the help of other students like Jonathan Mass and Kaden Caliendo, CTIR now had a way to measure tides in San Luis Obispo. The next step was making it consistent and being able to share the information that mattered with the community. </p>
+        <p>That's the work that Civil Engineering and Water Resources professor Stephan Talke, has been trying to do for the majority of his career. After years of research on the history of tide measurements, including post doctoral work on intertidal mudflats on the border of the Netherlands and Germany, Talke realized how tide measurements were one of the best ways to indicate sea level rise. It was also the best way to actually see how it was going to affect communities. With NOAA gauges so far apart the need for more gauges, at a lower price, in more areas is key to helping individual regions start figuring out solutions to sea level rise. So Talke started in San Luis Obispo, recruiting students from his classes to create CTIR. Now, we work to record SLO’s ocean movement and educate the community on how sea level rise will change our town.</p>
+        <blockquote>“We’re trying to create a baseline measurement of the coast at many more locations than currently exists.” 
+- Prof. Stephan Talke
+</blockquote>
+
+    </section>
+
+
+    <!-- ============================================
+         PHOTOS SECTION: Slideshow gallery
+         - Add/remove <div class="slide"> blocks for each photo
+         - Update the img src and alt text for each photo
+         - The caption text appears below each photo
+         ============================================ -->
+    <section id="photos" class="section">
+        <h2>A Day Out In the Field</h2>
+        <p class="section-intro">Students go out to Cal Poly pier to install a new radar gauge that can collect data remotely.</p>
+        <div class="slideshow">
+            <div class="slide active">
+                <img src="img/photo1.jpg" alt="Photo caption here">
+                <p class="caption">CTIR engages in weekly field work collecting data or deploying new equipment to monitor tidal changes. On May 14th, the task at hand was deploying a homemade Radar Gauge at the Cal Poly Pier.</p>
+            </div>
+            <div class="slide">
+                <img src="img/photo2.jpg" alt="Photo caption here">
+                <p class="caption">Eugene Petrov, a fourth year computer engineering major, and Collin Roppe, a second year mechanical engineering major, drive down the lengthy path to the end of the pier. Eugene has been working on the radar gauges since last year, figuring out how to create a homemade solution that costs less to produce and deploy than other comercially sold gauges. Collin just joined the project recently and has been helping build the mount for this specific gauge. Eugene points out the pipes that line the pier, explainging how they were used to transport oil in the early 1900's.</p>
+            </div>
+            <div class="slide">
+                <img src="img/photo3.jpg" alt="Photo caption here">
+                <p class="caption">Pier Technician  greets us as we roll onto the metal grates. The pier is mostly used by professors and other reserach projects like ours. Its technicians like blank and other assistants that help support students and professors projects.  </p>
+            </div>
+            <div class="slide">
+                <img src="img/photo4.jpg" alt="Photo caption here">
+                <p class="caption">CTIR's homemade radar gauge uses a small radar sensor which shoots radar signals from the gauge to the water and tracks how much time it takes for the signal to return to the sensor, telling us how high the water is at different times of day. The data usually has to be manually collected and analyzed by opening up the gauge and retrieving a tiny SD card. Eugene's tweak to the gauge allows CTIR to collect the data remotely on a laptop, making it easier to analyze and to track day to day. </p>
+            </div>
+            <div class="slide">
+                <img src="img/photo5.jpg" alt="Photo caption here">
+                <p class="caption">Eugene and Collin fiddle with the equipment, making sure everything is properly turned on and connected and then checking to see if the sensor is responding on Eugene's laptop. The next task is the more nerve wracking part of installation which entails dangling the gauge and it's wooden mount over the side of the pier, until it's fastened. </p>
+            </div>
+            <div class="slide">
+                <img src="img/photo6.jpg" alt="Photo caption here">
+                <p class="caption">Eugene and Collin's workspace is a bit cramped. The wooden board beneath their feet ensures that nothing within their immediate vicinity is dropped between the grates 20ft into the water. Professor Talke brought one of his water dynamics classes to watch the installation. Now, the duo just have to make sure that the actual gauge isn't dropped in the water, especially in front of their newly acquired audience. </p>
+            </div>
+            <div class="slide">
+                <img src="img/photo7.jpg" alt="Photo caption here">
+                <p class="caption">Pier manager Tom Moylan, chats with Professor Talke's class, reciting the history of the pier and his role managing it. Him and professor Talke banter back and forth about the multitude of projects they've helped out with on the Pier. Tom lets out a hardy laugh as professor Talke jokes that he's only had one student on the CTIR team fall into the water at a different location when deploying a gauge. Hopefully something that doesn't happen today, fingers crossed.  </p>
+            </div>
+            <div class="slide">
+                <img src="img/photo8.jpg" alt="Photo caption here">
+                <p class="caption">"Anyone know any sailor knots?" Eugene asks, laughing somewhat nervously as the two begin to fasten the mount to the pier. A rope keeps the mount secured as they place U-shaped bolts around the pier railing. Once the bolts are placed, the hard part is over.  </p>
+            </div>
+                <div class="slide">
+                    <img src="img/photo9.jpg" alt="Photo caption here">
+                    <p class="caption">Afterfastening the bolts to the railing, the fresh gauge sits proudly above the water. </p>
+                </div>
+            <div class="slide">
+             <img src="img/photo10.jpg" alt="Photo caption here">
+             <p class="caption">Professor Talke and Collin admire the gauge. The hope is to come back in a couple weeks and evaluate how the hommade gauge fairs against the previously installed gauge which doesn't have remote data collection.</p>
+             </div>
+             <div class="slide">
+                <img src="img/photo11.jpg" alt="Photo caption here">
+                <p class="caption">Collin and Eugene thread an extension cord that will power the gauge to an outlet on the pier. Not only is the new gauge remote, the team doesn't have to worry about the solar powered battery, which often wouldn't charge the gauge consistently on cloudy or rainy days. This is a big step in streamlinging the way CTIR collects data as well as the quality of the data collected.</p>
+            </div>
+            <div class="slide">
+                <img src="img/photo12.jpg" alt="Photo caption here">
+                <p class="caption">Eugene pulls up the program that tracks the data from the sensor and sure enough the gauge had started taking readings and putting them into a graph. One the team now can access while on Cal Poly's WIFI network. </p>
+            </div>
+
+        </div>
+        <div class="slide-controls">
+            <button onclick="changeSlide(-1)">&#8592; Prev</button>
+            <span class="slide-counter">
+                <span id="current-slide">1</span> / <span id="total-slides">3</span>
+            </span>
+            <button onclick="changeSlide(1)">Next &#8594;</button>
+        </div>
+    </section>
+
+  <section class="section story-text">
+<span class="eyebrow">The Team</span>
+<h2>Students Learn By Doing.</h2>
+<p> As Cal Poly students, CTIR team members take charge of their education. Encouraged not only to brainstorm solutions but take their ideas and turn it into a reality. From fixing or redesigning gauges, to planning deployment methods, to collecting and processing data, students use their own unique skills to further this project each step of the way. The inner workings of this project are really an endless cycle of trial and error. However, in an environment where you’re surrounded by passionate peers, the problem solving process is collaborative. Putting out solutions that are a mix of creativity and team work.
+</p>
+
+    <!-- ============================================
+         VIDEO SECTION: Embedded video player
+         - Update src to your video file path
+         - Update poster to a thumbnail image
+         ============================================ -->
+    <section id="video" class="section">
+        <h2>Video</h2>
+        <p class="section-intro">Write 1-2 sentences here introducing your video. What does it show, and why is it important to your story?</p>
+        <div class="video-wrapper">
+            <video controls poster="img/poster.jpg">
+                <source src="video/video.mp4" type="video/mp4">
+                <track kind="captions" src="captions.vtt" srclang="en" label="English" default>
+                Your browser does not support video.
+            </video>
+            <p class="caption">Video caption here</p>
+        </div>
+    </section>
+
+    <!-- ============================================
+         PARALLAX DIVIDER
+         - Change the background image in style.css
+         - Look for ".parallax-2"
+         ============================================ -->
+    <div class="parallax-divider parallax-2" aria-hidden="true"></div>
+
+<span class="eyebrow">Where We Work</span>
+<h2>From Morro Bay to Cal Poly Pier - Where We Work.</h2>
+<div class="storymap-wrapper">
+    <iframe src="https://uploads.knightlab.com/storymapjs/3e7346cfdbd703910655b0e93a238ccc/ctir-tide-gauges/index.html" frameborder="0" allowfullscreen></iframe>
+</div>
+</section>
+
+<section id="read-about-us" class="section story-text">
+<span class="eyebrow">Looking Ahead</span>
+<h2>Sea Level Rise Isn’t Going Away.</h2>
+<p>This isn’t something that’s going to lessen, or even go back to the way it was a decade ago. Our coastlines are actively changing, so we must change too. Collecting information about tides may seem mundane, but it’s what will help us fight beach loss, save our homes, and be able to continue living in the places we love and want to protect.
+</p>
+<p class="pull-quote">Our coastlines are actively changing, so we must change too.</p>
+
+    <!-- ============================================
+         PARALLAX DIVIDER
+         - Change the background image in style.css
+         - Look for ".parallax-3"
+         ============================================ -->
+    <div class="parallax-divider parallax-3" aria-hidden="true"></div>
+
+<span class="eyebrow">Stay Connected</span>
+<h2>Want to Stay Informed?</h2>
+<p>Follow along as we continue to collect data and share what we find.</p>
+</section>
+
+<section id="news" class="section">
+    <span class="eyebrow">In the News</span>
+    <h2>Read About Us</h2>
+    <div class="article-cards">
+        <a href="https://kcpr.org/cal-poly-and-central-coast-team-up/" class="article-card" target="_blank">
+            <div class="article-card-img" style="background-image: url('img/KCPRarticle.jpg')"></div>
+            <div class="article-card-body">
+                <p>Cal Poly and Central Coast team up to tackle sea level rise through King Tides project</p>
+                <span class="article-source">KCPR</span>
+            </div>
+        </a>
+        <a href="https://ceng.calpoly.edu/connection/2024/02/surfing-the-tide-of-change-how-an-australian-oceanographer-is-making-waves-in-environmental-science/" class="article-card" target="_blank">
+            <div class="article-card-img" style="background-image: url('img/CENGarticle.jpg')"></div>
+            <div class="article-card-body">
+                <p>Surfing the Tide of Change: How an Australian Oceanographer is Making Waves in Environmental Science</p>
+                <span class="article-source">Cal Poly Engineering</span>
+            </div>
+        </a>
+        <a href="https://digitalcommons.calpoly.edu/cgi/viewcontent.cgi?article=4313&context=theses" class="article-card" target="_blank">
+            <div class="article-card-img" style="background-image: url('img/Dunnthesis.jpg')"></div>
+            <div class="article-card-body">
+                <p>Development of a Low Cost Acoustic Gauge for Simultaneous Tide and Wave Measurement</p>
+                <span class="article-source">Alex Dunn — Senior Thesis 2023</span>
+            </div>
+        </a>
+    </div>
+</section>
+
+    
+
+    <!-- ============================================
+         INFOGRAPHIC SECTION (OPTIONAL)
+         - To use: delete the comment tags surrounding the section
+           below (the standalone lines that read: less-than !dash-dash
+           and dash-dash greater-than)
+         - Paste your embed code (Datawrapper, Flourish,
+           Infogram, etc.) where indicated
+         - To skip: leave this section as-is
+         ============================================ -->
+
+    <!--
+    <section id="infographic" class="section alt-bg">
+        <h2>By the Numbers</h2>
+        <p class="section-intro">Write 1-2 sentences here introducing your data visualization.</p>
+        <div class="infographic-wrapper">
+
+            PASTE YOUR EMBED CODE HERE
+
+        </div>
+    </section>
+    -->
+
+    <!-- ============================================
+         FOOTER: Credits and contact info
+         - Edit your name, date, and email below
+         ============================================ -->
+    <footer id="footer">
+        <p>CTIR| By Ayla Boose | May 2026</p>
+        <p><a href="mailto:youremail@email.com">aylaboose@gmail.com</a></p>
+    </footer>
+
+    <!-- ============================================
+         BACK TO TOP BUTTON
+         - Appears automatically after scrolling down
+         - No changes needed here
+         ============================================ -->
+    <button id="back-to-top" title="Back to top">&#8593; Top</button>
+
+    <script src="script.js"></script>
+</body>
+</html>
