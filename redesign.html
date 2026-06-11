@@ -1,0 +1,1725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CTIR — Central Coast Tidal & Inundation Research</title>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;700&family=Inter+Tight:wght@300;400;500;600;700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css"/>
+    <link rel="stylesheet" href="style.css">
+
+    <style>
+    /* ─── GLOBAL DARK BODY ─── */
+    body {
+        background-color: #0a1020;
+        color: #e2e8f0;
+        padding-top: 0;
+    }
+
+    /* ─── NAV (always dark/scrolled on this page) ─── */
+    .navbar {
+        background-color: rgba(10,16,32,0.96);
+        backdrop-filter: blur(12px);
+        border-bottom-color: rgba(14,165,233,0.12);
+    }
+    .navbar .nav-links a { color: #f0f9ff; }
+    .navbar .hamburger span { background-color: #f0f9ff; }
+
+    /* ─── SCROLL PROGRESS ─── */
+    #scroll-progress {
+        background-color: #0ea5e9;
+        z-index: 1100;
+    }
+
+    /* ─── HERO ─── */
+    #hero {
+        min-height: 100vh;
+        background-image: url('img/hero.jpg');
+        background-size: cover;
+        background-position: center 30%;
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 0 0 10vh;
+        position: relative;
+        margin-top: 0;
+    }
+    #hero::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(to top,
+            rgba(8,14,30,0.97) 0%,
+            rgba(8,14,30,0.55) 45%,
+            rgba(8,14,30,0.18) 100%);
+    }
+    .hero-inner {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 60px;
+        width: 100%;
+    }
+    .hero-eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .72rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .28em;
+        color: #0ea5e9;
+        margin-bottom: 1.2rem;
+    }
+    #hero h1 {
+        font-size: clamp(3.2rem, 7vw, 6.5rem);
+        font-weight: 700;
+        line-height: 1.0;
+        letter-spacing: -.03em;
+        color: #f0f9ff;
+        margin: 0 0 1.4rem;
+    }
+    .hero-deck-new {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: clamp(1.1rem, 2vw, 1.35rem);
+        font-weight: 400;
+        line-height: 1.65;
+        color: rgba(240,249,255,.72);
+        max-width: 560px;
+        margin: 0 0 2.8rem;
+    }
+    .scroll-cue {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .72rem;
+        letter-spacing: .18em;
+        text-transform: uppercase;
+        color: rgba(14,165,233,.6);
+        display: flex;
+        align-items: center;
+        gap: .6rem;
+    }
+    .scroll-cue::before {
+        content: '';
+        display: inline-block;
+        width: 24px;
+        height: 1px;
+        background: #0ea5e9;
+        opacity: .5;
+    }
+
+    /* ─── NARRATIVE TEXT SECTIONS (DARK) ─── */
+    .narr {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 96px 24px;
+    }
+    .narr .eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .8rem;
+        text-align: left;
+    }
+    .narr h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.6rem, 3.5vw, 2.6rem);
+        font-weight: 600;
+        letter-spacing: -.03em;
+        color: #f0f9ff;
+        line-height: 1.15;
+        margin: 0 0 1.8rem;
+        text-align: left;
+    }
+    .narr p {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1.08rem;
+        line-height: 1.82;
+        color: rgba(240,249,255,.68);
+        margin: 0 0 1.4em;
+    }
+    .narr p.lead-p {
+        font-size: 1.18rem;
+        color: rgba(240,249,255,.82);
+    }
+    .narr blockquote {
+        border-left: 3px solid #0ea5e9;
+        padding: 1.2rem 0 1.2rem 1.6rem;
+        margin: 3rem 0;
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1.2rem;
+        font-style: italic;
+        line-height: 1.7;
+        color: rgba(240,249,255,.8);
+        background: none;
+    }
+    .narr blockquote::before { display: none; }
+    .narr blockquote cite {
+        display: block;
+        font-size: .82rem;
+        font-style: normal;
+        font-family: 'Inter Tight', sans-serif;
+        color: #0ea5e9;
+        margin-top: .8rem;
+        letter-spacing: .04em;
+    }
+
+    /* ─── STICKY SCROLLYTELLING: COAST MAP ─── */
+    #scrolly-coast {
+        display: flex;
+        position: relative;
+        max-width: 1200px;
+        margin: 0 auto;
+        gap: 0;
+    }
+    #scrolly-text {
+        flex: 0 0 42%;
+        padding: 0 48px 0 24px;
+    }
+    .scrolly-step {
+        min-height: 90vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        padding: 80px 0;
+        opacity: 0.35;
+        transition: opacity .4s ease;
+    }
+    .scrolly-step.active { opacity: 1; }
+    .scrolly-step .eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .8rem;
+        text-align: left;
+    }
+    .scrolly-step h3 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.4rem, 2.5vw, 2rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        line-height: 1.2;
+        margin: 0 0 1.2rem;
+    }
+    .scrolly-step p {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1.05rem;
+        line-height: 1.78;
+        color: rgba(240,249,255,.65);
+    }
+    #scrolly-map-wrap {
+        flex: 0 0 58%;
+        position: sticky;
+        top: 60px;
+        height: calc(100vh - 60px);
+        overflow: hidden;
+    }
+    #coast-svg-wrap {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 40px 24px 40px 0;
+    }
+    #coast-svg {
+        width: 100%;
+        max-width: 560px;
+        height: auto;
+    }
+
+    /* coast dots */
+    .coast-dot {
+        cursor: default;
+        transition: r .3s ease, opacity .3s ease;
+    }
+    .coast-dot.hidden { opacity: 0; }
+    .coast-label {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: 11px;
+        fill: rgba(240,249,255,.0);
+        transition: fill-opacity .4s ease;
+        pointer-events: none;
+    }
+    .coast-label.shown { fill: rgba(240,249,255,.75); }
+
+    /* ─── DIVIDER WAVE ─── */
+    .wave-divider {
+        width: 100%;
+        height: 80px;
+        overflow: hidden;
+        line-height: 0;
+    }
+    .wave-divider svg { display: block; width: 100%; height: 100%; }
+
+    /* ─── AUDIO SECTION (DARK RESKIN) ─── */
+    #audio-section {
+        background: #060d1a;
+        padding: 80px 24px;
+    }
+    #audio-section .sec-head {
+        text-align: center;
+        margin-bottom: 3rem;
+    }
+    #audio-section .sec-head .eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .6rem;
+    }
+    #audio-section .sec-head h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.02em;
+        margin: 0 0 .8rem;
+    }
+    #audio-section .sec-head p {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: .96rem;
+        color: rgba(240,249,255,.5);
+        max-width: 520px;
+        margin: 0 auto;
+        line-height: 1.7;
+    }
+    .ap-grid-dark {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 1.2rem;
+        max-width: 900px;
+        margin: 0 auto;
+    }
+    .ap-card-dark {
+        background: rgba(14,165,233,.05);
+        border: .5px solid rgba(14,165,233,.2);
+        border-radius: 8px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: border-color .2s, background .2s;
+    }
+    .ap-card-dark:hover { background: rgba(14,165,233,.09); border-color: rgba(14,165,233,.4); }
+    .ap-card-dark.playing { border-color: #0ea5e9; }
+    .ap-art-dark { position: relative; height: 160px; overflow: hidden; background: rgba(14,165,233,.06); }
+    .ap-art-dark img { width: 100%; height: 100%; object-fit: contain; object-position: center; display: block; padding: 8px; }
+    .ap-wave-overlay { position: absolute; bottom: 0; left: 0; right: 0; height: 44px; display: flex; align-items: flex-end; justify-content: center; gap: 2px; padding: 0 12px 8px; opacity: 0; transition: opacity .3s ease; background: linear-gradient(to top, rgba(6,13,26,0.85), transparent); }
+    .ap-card-dark.playing .ap-wave-overlay { opacity: 1; }
+    .ap-bar { width: 3px; border-radius: 2px; background: #0ea5e9; height: 4px; transform-origin: bottom; }
+    .ap-info-dark { padding: .9rem 1.1rem .6rem; }
+    .ap-gauge-label-d { font-family: 'Inter Tight', sans-serif; font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .15em; color: #0ea5e9; opacity: .7; margin-bottom: .2rem; }
+    .ap-gauge-name-d { font-family: 'Inter Tight', sans-serif; font-size: .95rem; font-weight: 600; color: #f0f9ff; margin-bottom: .15rem; }
+    .ap-speaker-d { font-family: 'Source Serif 4', Georgia, serif; font-size: .78rem; color: rgba(240,249,255,.45); font-style: italic; }
+    .ap-controls-dark { padding: .5rem 1.1rem .9rem; display: flex; flex-direction: column; gap: .5rem; border-top: .5px solid rgba(14,165,233,.1); }
+    .ap-progress-wrap { position: relative; height: 3px; background: rgba(255,255,255,.08); border-radius: 2px; cursor: pointer; }
+    .ap-progress-fill { height: 100%; background: #0ea5e9; border-radius: 2px; width: 0%; pointer-events: none; }
+    .ap-progress-thumb { position: absolute; top: 50%; transform: translateY(-50%) translateX(-50%); width: 10px; height: 10px; border-radius: 50%; background: #0ea5e9; opacity: 0; transition: opacity .2s; left: 0%; }
+    .ap-card-dark.playing .ap-progress-thumb { opacity: 1; }
+    .ap-bottom-row { display: flex; align-items: center; justify-content: space-between; }
+    .ap-play-btn-d { width: 34px; height: 34px; border-radius: 50%; background: #0ea5e9; border: none; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .18s; flex-shrink: 0; }
+    .ap-play-btn-d:hover { background: #38bdf8; }
+    .ap-play-btn-d svg { width: 13px; height: 13px; fill: #0f172a; }
+    .ap-time-d { font-family: 'Inter Tight', sans-serif; font-size: .7rem; color: rgba(240,249,255,.35); letter-spacing: .04em; }
+
+    /* ─── PHOTO ESSAY (cinematic full-viewport) ─── */
+    #photos {
+        padding: 0;
+        max-width: 100%;
+        margin: 0;
+    }
+    .hg-outer { position: relative; background: #060d1a; height: calc(12 * 60vh); }
+    .hg-sticky { position: sticky; top: 0; height: 100vh; overflow: hidden; display: flex; flex-direction: column; justify-content: center; }
+    canvas#hg-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+    .hg-header { position: relative; z-index: 2; text-align: center; padding: 2rem 2rem .8rem; pointer-events: none; }
+    .hg-eyebrow { font-family: 'Inter Tight', sans-serif; font-size: .68rem; font-weight: 500; text-transform: uppercase; letter-spacing: .22em; color: #0ea5e9; display: block; margin-bottom: .4rem; }
+    .hg-title { font-family: 'Inter Tight', sans-serif; font-size: clamp(1.2rem, 2.5vw, 1.7rem); font-weight: 600; letter-spacing: -.02em; color: #f0f9ff; margin-bottom: .3rem; }
+    .hg-deck { font-family: 'Inter Tight', sans-serif; font-size: .8rem; color: #475569; }
+    .hg-track-wrap { position: relative; z-index: 2; flex: 1; display: flex; align-items: center; overflow: hidden; padding: 0 8vw; }
+    .hg-track { display: flex; align-items: center; gap: 6vw; will-change: transform; }
+    .hg-slide { flex: 0 0 auto; width: min(480px, 72vw); display: flex; flex-direction: column; gap: 1rem; opacity: 0; transition: opacity .5s ease; }
+    .hg-slide.vis { opacity: 1; }
+    .hg-slide:nth-child(odd) .hg-cap { order: -1; }
+    .hg-slide:nth-child(even) .hg-cap { order: 2; }
+    .hg-img { width: 100%; aspect-ratio: 3/2; object-fit: cover; border-radius: 4px; box-shadow: 0 8px 40px rgba(0,0,0,.55); display: block; }
+    .hg-cap { display: flex; flex-direction: column; gap: .4rem; }
+    .hg-counter { font-family: 'Inter Tight', sans-serif; font-size: .65rem; font-weight: 500; text-transform: uppercase; letter-spacing: .18em; color: #0ea5e9; display: flex; align-items: center; gap: .45rem; }
+    .hg-line { display: inline-block; width: 16px; height: 1px; background: #0ea5e9; }
+    .hg-caption { font-family: 'Source Serif 4', Georgia, serif; font-size: .82rem; color: rgba(240,249,255,.72); line-height: 1.7; }
+    .hg-progress-bar { position: relative; z-index: 2; height: 2px; margin: 0 8vw .6rem; background: rgba(255,255,255,.06); border-radius: 1px; }
+    .hg-progress-fill { height: 100%; background: #0ea5e9; border-radius: 1px; width: 0%; }
+    .hg-hint { position: relative; z-index: 2; text-align: center; font-family: 'Inter Tight', sans-serif; font-size: .65rem; letter-spacing: .12em; text-transform: uppercase; color: #1e3a5a; padding-bottom: .8rem; }
+
+    /* ─── INFOGRAPHIC INLINE WRAPPER ─── */
+    #infographic-inline {
+        background: #060d1a;
+    }
+    .infog-intro {
+        text-align: center;
+        padding: 80px 24px 0;
+        max-width: 700px;
+        margin: 0 auto;
+    }
+    .infog-intro .eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .8rem;
+    }
+    .infog-intro h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2.4rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.02em;
+        margin: 0 0 1rem;
+    }
+    .infog-intro p {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1rem;
+        color: rgba(240,249,255,.55);
+        line-height: 1.75;
+        margin: 0 0 2.5rem;
+    }
+
+    /* ─── VIDEO SECTION ─── */
+    #video-section {
+        padding: 80px 24px;
+        max-width: 960px;
+        margin: 0 auto;
+    }
+    #video-section .sec-label {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        display: block;
+        margin-bottom: .8rem;
+    }
+    #video-section h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.02em;
+        margin: 0 0 .8rem;
+    }
+    #video-section .intro {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1.02rem;
+        color: rgba(240,249,255,.55);
+        margin: 0 0 2rem;
+        line-height: 1.7;
+    }
+    .video-wrap-new {
+        width: 100%;
+        border-radius: 8px;
+        overflow: hidden;
+        box-shadow: 0 16px 64px rgba(0,0,0,.6);
+    }
+    .video-wrap-new video {
+        width: 100%;
+        height: auto;
+        display: block;
+        background: #060d1a;
+    }
+
+    /* ─── MAP SECTION ─── */
+    #map-section {
+        padding: 80px 24px;
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+    #map-section .sec-label {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        display: block;
+        margin-bottom: .8rem;
+    }
+    #map-section h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.5rem, 3vw, 2.2rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.02em;
+        margin: 0 0 .6rem;
+    }
+    #map-section .intro {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1rem;
+        color: rgba(240,249,255,.5);
+        margin: 0 0 1.8rem;
+        line-height: 1.7;
+    }
+    #ctir-map {
+        width: 100%;
+        height: 520px;
+        border-radius: 8px;
+        z-index: 0;
+        border: .5px solid rgba(14,165,233,.18);
+    }
+
+    /* ─── CLOSING / LOOKING AHEAD ─── */
+    #closing {
+        max-width: 700px;
+        margin: 0 auto;
+        padding: 96px 24px 80px;
+    }
+    #closing .eyebrow {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .8rem;
+    }
+    #closing h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.7rem, 3.5vw, 2.8rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.03em;
+        line-height: 1.15;
+        margin: 0 0 1.8rem;
+    }
+    #closing p {
+        font-family: 'Source Serif 4', Georgia, serif;
+        font-size: 1.08rem;
+        line-height: 1.82;
+        color: rgba(240,249,255,.65);
+        margin: 0 0 1.4em;
+    }
+    .pull-dark {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.4rem, 2.5vw, 1.9rem);
+        font-weight: 500;
+        line-height: 1.3;
+        color: #f0f9ff;
+        margin: 3rem 0;
+        padding-left: 1.2rem;
+        border-left: 3px solid #0ea5e9;
+    }
+    .about-link {
+        display: inline-flex;
+        align-items: center;
+        gap: .5rem;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .82rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .12em;
+        color: #0ea5e9;
+        text-decoration: none;
+        border: 1px solid rgba(14,165,233,.35);
+        padding: .65rem 1.4rem;
+        border-radius: 3px;
+        transition: background .18s, border-color .18s;
+        margin-top: .5rem;
+    }
+    .about-link:hover { background: rgba(14,165,233,.1); border-color: #0ea5e9; }
+
+    /* ─── NEWS CARDS ─── */
+    #news-section {
+        padding: 0 24px 96px;
+        max-width: 1080px;
+        margin: 0 auto;
+    }
+    #news-section .sec-label {
+        display: block;
+        font-family: 'Inter Tight', sans-serif;
+        font-size: .68rem;
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: .25em;
+        color: #0ea5e9;
+        margin-bottom: .8rem;
+    }
+    #news-section h2 {
+        font-family: 'Inter Tight', sans-serif;
+        font-size: clamp(1.4rem, 2.5vw, 2rem);
+        font-weight: 600;
+        color: #f0f9ff;
+        letter-spacing: -.02em;
+        margin: 0 0 2rem;
+    }
+    .news-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 1.2rem;
+    }
+    .news-card {
+        background: rgba(255,255,255,.03);
+        border: .5px solid rgba(255,255,255,.08);
+        border-radius: 8px;
+        overflow: hidden;
+        text-decoration: none;
+        display: flex;
+        flex-direction: column;
+        transition: border-color .2s, background .2s, transform .2s;
+    }
+    .news-card:hover { background: rgba(14,165,233,.06); border-color: rgba(14,165,233,.3); transform: translateY(-3px); }
+    .news-card-img { height: 160px; background-size: cover; background-position: center; }
+    .news-card-body { padding: 1.1rem 1.2rem 1.3rem; flex: 1; display: flex; flex-direction: column; gap: .6rem; }
+    .news-card-body p { font-family: 'Inter Tight', sans-serif; font-size: .9rem; font-weight: 500; color: #f0f9ff; line-height: 1.45; margin: 0; }
+    .news-source { font-family: 'Inter Tight', sans-serif; font-size: .65rem; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: #0ea5e9; margin-top: auto; }
+
+    /* ─── FOOTER ─── */
+    footer {
+        background: #060d1a;
+        border-top: .5px solid rgba(14,165,233,.12);
+    }
+
+    /* ─── MAP POPUP STYLES ─── */
+    .ctir-popup .leaflet-popup-content-wrapper { background: #0f172a; border: 1px solid rgba(14,165,233,0.3); border-radius: 6px; box-shadow: 0 8px 32px rgba(0,0,0,.5); padding: 0; }
+    .ctir-popup .leaflet-popup-content { margin: 0; width: 220px !important; }
+    .ctir-popup .leaflet-popup-tip { background: #0f172a; }
+    .ctir-popup .leaflet-popup-close-button { color: #475569 !important; font-size: 16px !important; top: 8px !important; right: 10px !important; }
+    .ctir-popup .leaflet-popup-close-button:hover { color: #f0f9ff !important; }
+    .popup-inner { padding: 1rem 1.1rem; }
+    .popup-eyebrow { font-family: 'Inter Tight', sans-serif; font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .18em; color: #0ea5e9; margin-bottom: .3rem; }
+    .popup-name { font-family: 'Inter Tight', sans-serif; font-size: .95rem; font-weight: 600; color: #f0f9ff; margin-bottom: .3rem; line-height: 1.2; }
+    .popup-type { font-family: 'Source Serif 4', Georgia, serif; font-size: .78rem; color: rgba(240,249,255,.6); line-height: 1.5; margin-bottom: .5rem; }
+    .popup-badge { display: inline-flex; align-items: center; gap: .3rem; font-family: 'Inter Tight', sans-serif; font-size: .62rem; font-weight: 500; text-transform: uppercase; letter-spacing: .1em; color: #0ea5e9; background: rgba(14,165,233,0.12); border: 1px solid rgba(14,165,233,0.25); padding: .18rem .5rem; border-radius: 3px; }
+    .popup-dot { width: 5px; height: 5px; border-radius: 50%; background: #0ea5e9; flex-shrink: 0; }
+
+    /* ─── BACK TO TOP ─── */
+    #back-to-top { background: #0ea5e9; color: #0f172a; font-weight: 600; }
+    #back-to-top:hover { background: #38bdf8; }
+
+    /* ─── MOBILE ─── */
+    @media (max-width: 768px) {
+        #scrolly-coast { flex-direction: column; }
+        #scrolly-map-wrap { position: relative; top: 0; height: 55vw; flex: none; }
+        #scrolly-text { flex: none; padding: 0 20px; }
+        .scrolly-step { min-height: 60vh; }
+        .hero-inner { padding: 0 24px; }
+        .narr { padding: 64px 20px; }
+    }
+    </style>
+</head>
+<body>
+    <div id="scroll-progress"></div>
+
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo"><a href="main.html"><img src="img/CTIRstamp.png" alt="CTIR"/></a></div>
+            <button class="hamburger" onclick="toggleNav()">
+                <span></span><span></span><span></span>
+            </button>
+            <ul class="nav-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="#photos">Field Work</a></li>
+                <li><a href="#infographic-inline">By the Numbers</a></li>
+                <li><a href="#map-section">Map</a></li>
+                <li><a href="about.html">Team</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- ══════════════════════════════════════
+         HERO
+    ══════════════════════════════════════ -->
+    <section id="hero">
+        <div class="hero-inner">
+            <span class="hero-eyebrow">Cal Poly SLO · Center for Coastal Marine Sciences</span>
+            <h1>Coastal Tide<br>Impact Research</h1>
+            <p class="hero-deck-new">Cal Poly students are mapping how the Central Coast is changing — one tide at a time.</p>
+            <span class="scroll-cue">Scroll to read the story</span>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         OPENING NARRATIVE
+    ══════════════════════════════════════ -->
+    <div class="narr">
+        <p class="lead-p">For some, sea level rise might be a distant thing. But in the face of climate change, its effects are already reaching into coastal communities. Sea level rise has led to increased flooding, urban blockages, and sediment buildup in estuaries and bays. We've seen it firsthand — at Toro Creek Bridge, Morro Bay State Park, and other locations in San Luis Obispo. These effects will become increasingly drastic and more common as the climate continues to shift.</p>
+        <p>It's key that we begin tackling how to design our infrastructure for what's coming, and record what tides look like now so we have a baseline for understanding what will change. That's exactly what CTIR is doing.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         STICKY SCROLLYTELLING: COAST MAP
+    ══════════════════════════════════════ -->
+    <div id="scrolly-coast">
+        <div id="scrolly-text">
+            <div class="scrolly-step active" data-step="0">
+                <span class="eyebrow">The Problem</span>
+                <h3>Tide Gauges in California Are 100 Miles Apart. That's Not Enough.</h3>
+                <p>NOAA specializes in collecting environmental data including tide levels. But gauges are sparsely located — one every 100 miles or so. At a price point of $25,000 each, before installation, the gaps between them are enormous.</p>
+            </div>
+            <div class="scrolly-step" data-step="1">
+                <span class="eyebrow">The Gaps</span>
+                <h3>Between Point Conception and Morro Bay, Almost Nothing.</h3>
+                <p>That stretch of coastline — bays, estuaries, creek mouths — sits in a data blind spot. Communities in this region are making planning decisions without the local tide data they need to make them correctly.</p>
+            </div>
+            <div class="scrolly-step" data-step="2">
+                <span class="eyebrow">CTIR's Response</span>
+                <h3>Low-Cost Gauges, Deployed by Students, at Key Locations.</h3>
+                <p>CTIR builds and deploys gauges that cost a fraction of NOAA instruments. From Los Osos Creek to the Cal Poly Pier, the team is filling in the gaps with real, local data.</p>
+                <blockquote style="border-left:2px solid #0ea5e9;padding:.8rem 0 .8rem 1.2rem;margin:1.6rem 0;font-family:'Source Serif 4',Georgia,serif;font-style:italic;font-size:1rem;color:rgba(240,249,255,.72);">"This project offers an ability to get across a message to people about how their shorelines might change in the future."
+                    <cite style="display:block;font-style:normal;font-family:'Inter Tight',sans-serif;font-size:.72rem;color:#0ea5e9;margin-top:.6rem;">— Dr. Serena Lee, Physical Oceanographer</cite>
+                </blockquote>
+            </div>
+        </div>
+
+        <div id="scrolly-map-wrap">
+            <div id="coast-svg-wrap">
+                <!-- California Central Coast schematic SVG -->
+                <svg id="coast-svg" viewBox="0 0 400 580" xmlns="http://www.w3.org/2000/svg" aria-label="Central Coast of California showing NOAA and CTIR gauge locations">
+
+                    <!-- Ocean background -->
+                    <rect x="0" y="0" width="400" height="580" fill="#060d1a"/>
+
+                    <!-- Coastline shape -->
+                    <path d="M 240,20 C 235,60 228,100 220,140 C 212,180 200,200 195,230
+                             C 190,260 192,280 186,305 C 180,330 170,345 162,365
+                             C 154,385 150,400 145,420 C 140,440 138,455 135,475
+                             C 132,495 130,520 128,560 L 400,560 L 400,20 Z"
+                          fill="#1a2a1a" stroke="rgba(14,165,233,0.25)" stroke-width="1"/>
+
+                    <!-- Ocean shimmer lines -->
+                    <line x1="20" y1="120" x2="90" y2="130" stroke="rgba(14,165,233,0.08)" stroke-width="1"/>
+                    <line x1="10" y1="200" x2="80" y2="208" stroke="rgba(14,165,233,0.06)" stroke-width="1"/>
+                    <line x1="30" y1="300" x2="100" y2="306" stroke="rgba(14,165,233,0.07)" stroke-width="1"/>
+                    <line x1="15" y1="400" x2="85" y2="410" stroke="rgba(14,165,233,0.06)" stroke-width="1"/>
+
+                    <!-- NOAA stations (large, white/gray) -->
+                    <!-- San Francisco area -->
+                    <circle cx="242" cy="28" r="7" fill="rgba(148,163,184,0.3)" stroke="rgba(148,163,184,0.6)" stroke-width="1.5" id="noaa-sf"/>
+                    <text x="256" y="32" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(148,163,184,0.7)">San Francisco</text>
+
+                    <!-- Monterey -->
+                    <circle cx="228" cy="145" r="7" fill="rgba(148,163,184,0.3)" stroke="rgba(148,163,184,0.6)" stroke-width="1.5" id="noaa-monterey"/>
+                    <text x="242" y="149" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(148,163,184,0.7)">Monterey</text>
+
+                    <!-- Gap indicator — dashed line between Monterey and Santa Barbara -->
+                    <line x1="225" y1="155" x2="190" y2="340" stroke="rgba(239,68,68,0.4)" stroke-width="1.2" stroke-dasharray="5,5" id="gap-line" opacity="0"/>
+                    <rect x="100" y="235" width="90" height="22" rx="4" fill="rgba(239,68,68,0.12)" stroke="rgba(239,68,68,0.35)" stroke-width=".5" id="gap-label-box" opacity="0"/>
+                    <text x="145" y="250" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(239,68,68,0.85)" text-anchor="middle" id="gap-label-text" opacity="0">~100 mi gap</text>
+
+                    <!-- Santa Barbara -->
+                    <circle cx="186" cy="345" r="7" fill="rgba(148,163,184,0.3)" stroke="rgba(148,163,184,0.6)" stroke-width="1.5" id="noaa-sb"/>
+                    <text x="200" y="349" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(148,163,184,0.7)">Santa Barbara</text>
+
+                    <!-- CTIR gauges (sky blue dots, hidden initially) -->
+                    <!-- Morro Bay area cluster -->
+                    <circle class="coast-dot hidden" cx="163" cy="277" r="5.5" fill="#0ea5e9" stroke="rgba(14,165,233,0.4)" stroke-width="6" id="ctir-mb1"/>
+                    <circle class="coast-dot hidden" cx="157" cy="292" r="5.5" fill="#0ea5e9" stroke="rgba(14,165,233,0.4)" stroke-width="6" id="ctir-mb2"/>
+                    <circle class="coast-dot hidden" cx="168" cy="308" r="5.5" fill="#0ea5e9" stroke="rgba(14,165,233,0.4)" stroke-width="6" id="ctir-lososos"/>
+
+                    <!-- Cal Poly Pier -->
+                    <circle class="coast-dot hidden" cx="148" cy="338" r="5.5" fill="#0ea5e9" stroke="rgba(14,165,233,0.4)" stroke-width="6" id="ctir-pier"/>
+
+                    <!-- Labels for CTIR clusters -->
+                    <text class="coast-label" x="185" y="285" font-family="Inter Tight, sans-serif" font-size="10" id="lbl-mb">Morro Bay (3 gauges)</text>
+                    <text class="coast-label" x="165" y="345" font-family="Inter Tight, sans-serif" font-size="10" id="lbl-pier">Cal Poly Pier</text>
+
+                    <!-- SLO county label -->
+                    <text x="280" y="295" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(255,255,255,0.15)" text-anchor="middle">San Luis</text>
+                    <text x="280" y="308" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(255,255,255,0.15)" text-anchor="middle">Obispo Co.</text>
+
+                    <!-- Compass -->
+                    <text x="48" y="548" font-family="Inter Tight, sans-serif" font-size="10" fill="rgba(14,165,233,0.45)" text-anchor="middle">N</text>
+                    <line x1="48" y1="530" x2="48" y2="518" stroke="rgba(14,165,233,0.35)" stroke-width="1.2"/>
+                    <polygon points="48,516 45,524 48,521 51,524" fill="rgba(14,165,233,0.5)"/>
+
+                    <!-- Legend -->
+                    <circle cx="24" cy="30" r="5" fill="rgba(148,163,184,0.3)" stroke="rgba(148,163,184,0.6)" stroke-width="1.5"/>
+                    <text x="34" y="34" font-family="Inter Tight, sans-serif" font-size="9.5" fill="rgba(148,163,184,0.65)">NOAA gauge</text>
+                    <circle cx="24" cy="50" r="5" fill="#0ea5e9"/>
+                    <text x="34" y="54" font-family="Inter Tight, sans-serif" font-size="9.5" fill="rgba(14,165,233,0.75)">CTIR gauge</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         ORIGIN STORY
+    ══════════════════════════════════════ -->
+    <div class="narr" style="padding-top:112px;">
+        <span class="eyebrow">Origin Story</span>
+        <h2>It Started with One Student and an Idea.</h2>
+        <p>When masters student Alex Dunn first joined the project, he fully committed his time to figuring out what made tide gauges tick. No one really knows how he figured out all the nitty gritty details, but he did. With the help of students like Jonathan Mass and Kaden Caliendo, CTIR now had a way to measure tides in San Luis Obispo.</p>
+        <p>That's the work that Civil Engineering and Water Resources professor Stephan Talke has been trying to do for the majority of his career. After years of research on the history of tide measurements — including post-doctoral work on intertidal mudflats on the border of the Netherlands and Germany — Talke realized how tide measurements were one of the best ways to indicate sea level rise. So he started in San Luis Obispo, recruiting students from his classes to create CTIR.</p>
+        <blockquote>
+            "We're trying to create a baseline measurement of the coast at many more locations than currently exists."
+            <cite>— Prof. Stephan Talke</cite>
+        </blockquote>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         AUDIO SECTION
+    ══════════════════════════════════════ -->
+    <section id="audio-section">
+        <div class="sec-head">
+            <span class="eyebrow">Listen In</span>
+            <h2>What Are Tide Gauges?</h2>
+            <p>The CTIR team breaks down how each gauge type works and why it matters.</p>
+        </div>
+        <div class="ap-grid-dark">
+
+            <!-- HOBO -->
+            <div class="ap-card-dark" id="ap-card-1">
+                <div class="ap-art-dark">
+                    <img src="img/hobo-gauge.jpg" alt="HOBO pressure gauge" loading="lazy">
+                    <div class="ap-wave-overlay" id="ap-wave-1"></div>
+                </div>
+                <div class="ap-info-dark">
+                    <p class="ap-gauge-label-d">Gauge Type</p>
+                    <p class="ap-gauge-name-d">HOBO Pressure Gauge</p>
+                    <p class="ap-speaker-d">Evan Thompson</p>
+                </div>
+                <div class="ap-controls-dark">
+                    <div class="ap-progress-wrap" id="ap-prog-wrap-1" onclick="apSeek(1,event)">
+                        <div class="ap-progress-fill" id="ap-prog-1"></div>
+                        <div class="ap-progress-thumb" id="ap-thumb-1"></div>
+                    </div>
+                    <div class="ap-bottom-row">
+                        <button class="ap-play-btn-d" id="ap-btn-1" onclick="apToggle(1)" aria-label="Play HOBO gauge audio">
+                            <svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>
+                        </button>
+                        <span class="ap-time-d" id="ap-time-1">0:00</span>
+                    </div>
+                </div>
+                <audio id="ap-audio-1"><source src="audio/hobogauge.m4a" type="audio/mp4"></audio>
+            </div>
+
+            <!-- RADAR -->
+            <div class="ap-card-dark" id="ap-card-2">
+                <div class="ap-art-dark">
+                    <img src="img/radar-gauge.jpg" alt="Radar gauge" loading="lazy">
+                    <div class="ap-wave-overlay" id="ap-wave-2"></div>
+                </div>
+                <div class="ap-info-dark">
+                    <p class="ap-gauge-label-d">Gauge Type</p>
+                    <p class="ap-gauge-name-d">Radar Gauge</p>
+                    <p class="ap-speaker-d">Eugene Petrov</p>
+                </div>
+                <div class="ap-controls-dark">
+                    <div class="ap-progress-wrap" id="ap-prog-wrap-2" onclick="apSeek(2,event)">
+                        <div class="ap-progress-fill" id="ap-prog-2"></div>
+                        <div class="ap-progress-thumb" id="ap-thumb-2"></div>
+                    </div>
+                    <div class="ap-bottom-row">
+                        <button class="ap-play-btn-d" id="ap-btn-2" onclick="apToggle(2)" aria-label="Play Radar gauge audio">
+                            <svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>
+                        </button>
+                        <span class="ap-time-d" id="ap-time-2">0:00</span>
+                    </div>
+                </div>
+                <audio id="ap-audio-2"><source src="audio/radargauge.aac" type="audio/aac"></audio>
+            </div>
+
+            <!-- ULTRASONIC -->
+            <div class="ap-card-dark" id="ap-card-3">
+                <div class="ap-art-dark">
+                    <img src="img/ultrasonic-gauge.jpg" alt="Ultrasonic gauge" loading="lazy">
+                    <div class="ap-wave-overlay" id="ap-wave-3"></div>
+                </div>
+                <div class="ap-info-dark">
+                    <p class="ap-gauge-label-d">Gauge Type</p>
+                    <p class="ap-gauge-name-d">Ultrasonic Gauge</p>
+                    <p class="ap-speaker-d">Charlie Newcomb</p>
+                </div>
+                <div class="ap-controls-dark">
+                    <div class="ap-progress-wrap" id="ap-prog-wrap-3" onclick="apSeek(3,event)">
+                        <div class="ap-progress-fill" id="ap-prog-3"></div>
+                        <div class="ap-progress-thumb" id="ap-thumb-3"></div>
+                    </div>
+                    <div class="ap-bottom-row">
+                        <button class="ap-play-btn-d" id="ap-btn-3" onclick="apToggle(3)" aria-label="Play Ultrasonic gauge audio">
+                            <svg viewBox="0 0 16 16"><path d="M4 2l10 6-10 6z"/></svg>
+                        </button>
+                        <span class="ap-time-d" id="ap-time-3">0:00</span>
+                    </div>
+                </div>
+                <audio id="ap-audio-3"><source src="audio/Ultrasonic gauge explanation.m4a" type="audio/mp4"></audio>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         PHOTO ESSAY (horizontal scroll)
+    ══════════════════════════════════════ -->
+    <section id="photos">
+      <div class="hg-outer" id="hg-outer">
+        <div class="hg-sticky" id="hg-sticky">
+          <canvas id="hg-canvas"></canvas>
+          <div class="hg-header">
+            <span class="hg-eyebrow">Photo Essay</span>
+            <h2 class="hg-title">A Day Out In the Field</h2>
+            <p class="hg-deck">Students deploy a new remote radar gauge at the Cal Poly Pier.</p>
+          </div>
+          <div class="hg-track-wrap">
+            <div class="hg-track" id="hg-track">
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>01 / 12</div>
+                  <p class="hg-caption">CTIR engages in weekly field work collecting data or deploying new equipment to monitor tidal changes. On May 14th, the task at hand was deploying a homemade Radar Gauge at the Cal Poly Pier.</p>
+                </div>
+                <img class="hg-img" src="img/photo1.jpg" alt="CTIR field deployment at Cal Poly Pier">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo2.jpg" alt="" loading="lazy">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>02 / 12</div>
+                  <p class="hg-caption">Eugene Petrov, a fourth year computer engineering major, and Collin Roppe, a second year mechanical engineering major, drive down the lengthy path to the end of the pier. Eugene points out long metal pipes that lined the pier — used to transport oil starting in the early 1900s. It wasn't until 2001, when Unocal donated the pier to Cal Poly's College of Science and Mathematics, that it was used for coastal marine work.</p>
+                </div>
+              </div>
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>03 / 12</div>
+                  <p class="hg-caption">Pier technician Jason Felton greets the team as they roll onto the metal grates. The pier is mostly used by professors and other research projects — technicians like Jason help support students and professors working on site.</p>
+                </div>
+                <img class="hg-img" src="img/photo3.jpg" alt="">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo4.jpg" alt="">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>04 / 12</div>
+                  <p class="hg-caption">CTIR's homemade radar gauge shoots radar signals from the gauge to the water and tracks how much time it takes for the signal to return, telling us how high the water is at different times of day. Eugene's modification allows CTIR to collect data remotely on a laptop — no more opening the gauge to retrieve a tiny SD card.</p>
+                </div>
+              </div>
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>05 / 12</div>
+                  <p class="hg-caption">Eugene and Collin fiddle with the equipment, making sure everything is properly connected, then check whether the sensor is responding on Eugene's laptop. The next task is the more nerve-wracking part of installation: dangling the gauge and its wooden mount over the side of the pier.</p>
+                </div>
+                <img class="hg-img" src="img/photo5.jpg" alt="">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo6.jpg" alt="">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>06 / 12</div>
+                  <p class="hg-caption">Their workspace is a bit cramped. A wooden board beneath their feet ensures nothing gets dropped between the grates 20 feet into the water. Professor Talke brought one of his water dynamics classes to watch — the duo now has an audience to perform for.</p>
+                </div>
+              </div>
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>07 / 12</div>
+                  <p class="hg-caption">Pier manager Tom Moylan chats with Professor Talke's class, reciting the history of the pier. Talke jokes that only one CTIR student has ever fallen into the water at a different deployment location. Hopefully not today.</p>
+                </div>
+                <img class="hg-img" src="img/photo7.jpg" alt="">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo8.jpg" alt="">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>08 / 12</div>
+                  <p class="hg-caption">"Anyone know any sailor knots?" Eugene asks, laughing somewhat nervously as the two begin to fasten the mount to the pier. A rope keeps the mount secured as they place U-shaped bolts around the pier railing. Once the bolts are placed, the hard part is over.</p>
+                </div>
+              </div>
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>09 / 12</div>
+                  <p class="hg-caption">After fastening the bolts to the railing, the fresh gauge sits proudly above the water.</p>
+                </div>
+                <img class="hg-img" src="img/photo9.jpg" alt="">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo10.jpg" alt="">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>10 / 12</div>
+                  <p class="hg-caption">Professor Talke and Collin admire the gauge. The hope is to return in a couple of weeks and evaluate how the homemade gauge fares against the previously installed gauge that lacks remote data collection.</p>
+                </div>
+              </div>
+
+              <div class="hg-slide">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>11 / 12</div>
+                  <p class="hg-caption">Collin and Eugene thread an extension cord to power the gauge from an outlet on the pier. This eliminates the solar panel battery reliability issue — on cloudy or rainy days, the old gauge would often fail to charge consistently. A big step in data quality.</p>
+                </div>
+                <img class="hg-img" src="img/photo11.jpg" alt="">
+              </div>
+
+              <div class="hg-slide">
+                <img class="hg-img" src="img/photo12.jpg" alt="">
+                <div class="hg-cap">
+                  <div class="hg-counter"><span class="hg-line"></span>12 / 12</div>
+                  <p class="hg-caption">Eugene pulls up the program that tracks the data from the sensor — and sure enough, the gauge has started taking readings and plotting them into a graph. The team can now access data from anywhere on Cal Poly's WiFi network.</p>
+                </div>
+              </div>
+
+            </div>
+          </div>
+          <div class="hg-progress-bar"><div class="hg-progress-fill" id="hg-fill"></div></div>
+          <p class="hg-hint">scroll to advance →</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Students learn by doing bridge text -->
+    <div class="narr" style="padding-top: 96px;">
+        <span class="eyebrow">The Team</span>
+        <h2>Students Learn By Doing.</h2>
+        <p>As Cal Poly students, CTIR team members take charge of their own education. They don't just brainstorm solutions — they build them. From redesigning gauges to planning deployments to processing raw data, each student brings something different to the table. The inner workings of this project are an endless cycle of trial and error, done collaboratively, in an environment where the problem-solving is as important as the outcome.</p>
+    </div>
+
+    <!-- ══════════════════════════════════════
+         VIDEO SECTION
+    ══════════════════════════════════════ -->
+    <section id="video-section">
+        <span class="sec-label">The Why</span>
+        <h2>Why Our Team Cares — and Why You Should Too.</h2>
+        <p class="intro">In their own words, the students and faculty behind CTIR explain what drives the work.</p>
+        <div class="video-wrap-new">
+            <video controls poster="img/poster.jpg">
+                <source src="video/CTIR VIDEO.mov" type="video/mp4">
+                <track kind="captions" src="captions.vtt" srclang="en" label="English" default>
+                Your browser does not support video.
+            </video>
+        </div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         INFOGRAPHIC (INLINED)
+    ══════════════════════════════════════ -->
+    <section id="infographic-inline">
+        <div class="infog-intro">
+            <span class="eyebrow">By the Numbers</span>
+            <h2>The CTIR Project at a Glance</h2>
+            <p>How the gauges work, where they're deployed, and what the data reveals about sea level rise along the Central Coast.</p>
+        </div>
+
+        <!-- ── INLINED INFOGRAPHIC CONTENT ── -->
+        <style>
+        *{box-sizing:border-box}
+        #infog{font-family:'Source Serif 4',Georgia,serif;background:#060d1a;color:#f8fafc;overflow:hidden;position:relative;width:100%}
+        .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+        .wave-bg{position:absolute;bottom:0;left:0;width:100%;height:100%;pointer-events:none;overflow:hidden;z-index:0}
+        .wave{position:absolute;bottom:0;left:-50%;width:200%;height:140px;border-radius:50% 50% 0 0}
+        .w1{background:rgba(14,165,233,0.09);animation:waveA 8s ease-in-out infinite}
+        .w2{background:rgba(100,116,139,0.07);animation:waveA 11s ease-in-out infinite reverse;bottom:18px}
+        .w3{background:rgba(14,165,233,0.05);animation:waveA 13s ease-in-out infinite;bottom:36px}
+        @keyframes waveA{0%,100%{transform:translateX(0) scaleY(1)}50%{transform:translateX(7%) scaleY(1.12)}}
+        .particles{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+        .dot{position:absolute;border-radius:50%;background:#0ea5e9;animation:floatUp linear infinite;opacity:0}
+        @keyframes floatUp{0%{transform:translateY(0) scale(0);opacity:0}10%{opacity:.35}90%{opacity:.1}100%{transform:translateY(-110px) scale(1);opacity:0}}
+        .i-panel{position:relative;z-index:1;padding:2.5rem 2rem;min-height:0}
+        .i-panel+.i-panel{border-top:.5px solid rgba(14,165,233,0.1)}
+        .scroll-nav{display:flex;gap:.5rem;padding:.85rem 1.5rem;background:#0ea5e9;position:sticky;top:60px;z-index:10;overflow-x:auto;scrollbar-width:none;justify-content:center}
+        .scroll-nav::-webkit-scrollbar{display:none}
+        .snav-btn{font-family:'Inter Tight',sans-serif;font-size:.72rem;text-transform:uppercase;letter-spacing:.09em;color:#fff;background:transparent;border:1.5px solid rgba(255,255,255,.45);padding:.38rem .95rem;border-radius:20px;cursor:pointer;white-space:nowrap;transition:background .18s,border-color .18s;flex-shrink:0}
+        .snav-btn:hover{background:#64748b;border-color:#64748b}
+        .snav-btn.active{background:rgba(255,255,255,.22);border-color:#fff}
+        .sec-eyebrow{font-family:'Inter Tight',sans-serif;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;color:#0ea5e9;opacity:.75;margin-bottom:.5rem}
+        .sec-title{font-size:1.25rem;font-weight:600;color:#f8fafc;margin-bottom:1.2rem;line-height:1.3}
+        .intro-text{font-family:'Inter Tight',sans-serif;font-size:.88rem;line-height:1.78;color:rgba(248,250,252,0.65);max-width:560px}
+        .intro-goal-list{margin-top:1.2rem;display:flex;flex-direction:column;gap:.5rem}
+        .goal-item{display:flex;align-items:flex-start;gap:.6rem;font-family:'Inter Tight',sans-serif;font-size:.82rem;color:rgba(248,250,252,.7);line-height:1.5}
+        .goal-dot{width:6px;height:6px;border-radius:50%;background:#0ea5e9;flex-shrink:0;margin-top:.38rem}
+        .gauge-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:.8rem}
+        .gauge-card{background:rgba(248,250,252,0.04);border:.5px solid rgba(100,116,139,0.3);border-radius:10px;padding:1.1rem 1rem;cursor:pointer;transition:all .22s;position:relative;overflow:hidden}
+        .gauge-card:hover,.gauge-card.active{background:rgba(14,165,233,0.1);border-color:rgba(14,165,233,0.45)}
+        .gauge-card.active::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:#0ea5e9}
+        .gauge-icon{width:44px;height:44px;margin-bottom:.8rem}
+        .g-num{font-family:'Inter Tight',sans-serif;font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;color:#0ea5e9;opacity:.6;margin-bottom:.25rem}
+        .g-name{font-size:.95rem;font-weight:600;color:#f8fafc;margin-bottom:.4rem}
+        .g-desc{font-family:'Inter Tight',sans-serif;font-size:.75rem;color:rgba(248,250,252,.5);line-height:1.5}
+        .gauge-detail{margin-top:1rem;background:rgba(15,23,42,0.7);border:.5px solid rgba(14,165,233,0.2);border-radius:8px;padding:1rem 1.2rem;display:none}
+        .gauge-detail.visible{display:block}
+        .gd-title{font-size:.9rem;font-weight:600;color:#0ea5e9;margin-bottom:.5rem}
+        .gd-body{font-family:'Inter Tight',sans-serif;font-size:.8rem;color:rgba(248,250,252,.62);line-height:1.65}
+        .gd-spec{display:flex;gap:.8rem;margin-top:.8rem;flex-wrap:wrap}
+        .gd-spec-item{background:rgba(14,165,233,0.07);border:.5px solid rgba(14,165,233,0.18);padding:.35rem .7rem;border-radius:5px}
+        .gd-spec-item span{font-family:'Inter Tight',sans-serif;font-size:.65rem;color:#0ea5e9;display:block;opacity:.7;text-transform:uppercase;letter-spacing:.06em}
+        .gd-spec-item strong{font-family:'Inter Tight',sans-serif;font-size:.78rem;color:#f8fafc;font-weight:500}
+        .hw-diagram{display:flex;flex-direction:column;align-items:center;gap:0;margin:1.4rem 0 1rem}
+        .hw-step{display:flex;align-items:center;gap:1rem;width:100%;max-width:480px;padding:.75rem 1rem;border-radius:8px;background:rgba(248,250,252,0.04);border:.5px solid rgba(100,116,139,0.2);transition:all .2s}
+        .hw-step:hover{background:rgba(14,165,233,0.08)}
+        .hw-step+.hw-step{margin-top:.5rem}
+        .hw-arrow-down{width:1px;height:22px;background:rgba(14,165,233,0.25);margin:0 auto}
+        .hw-step-num{width:32px;height:32px;border-radius:50%;background:rgba(14,165,233,0.12);border:.5px solid rgba(14,165,233,0.35);display:flex;align-items:center;justify-content:center;font-family:'Inter Tight',sans-serif;font-size:.72rem;color:#0ea5e9;flex-shrink:0;font-weight:500}
+        .hw-step-text{font-family:'Inter Tight',sans-serif;font-size:.8rem;color:rgba(248,250,252,.7);line-height:1.4}
+        .hw-step-text strong{color:#f8fafc;font-weight:500;display:block;margin-bottom:.15rem;font-size:.83rem}
+        .formula-box{margin-top:1rem;background:rgba(14,165,233,0.06);border:.5px solid rgba(14,165,233,0.28);border-radius:8px;padding:.9rem 1.2rem;text-align:center;max-width:300px;margin-left:auto;margin-right:auto}
+        .formula-box p{font-family:'Inter Tight',sans-serif;font-size:.72rem;color:rgba(14,165,233,0.65);text-transform:uppercase;letter-spacing:.08em;margin-bottom:.3rem}
+        .formula-box code{font-size:1rem;color:#0ea5e9;letter-spacing:.05em}
+        .tide-wrap{position:relative;margin:1rem 0;border-radius:10px;overflow:hidden;border:.5px solid rgba(14,165,233,0.22);background:#060d1a}
+        #tide-canvas{display:block;width:100%;height:220px}
+        .tide-ctrl{display:flex;align-items:center;gap:.8rem;margin-top:.6rem}
+        .tide-ctrl label{font-family:'Inter Tight',sans-serif;font-size:.75rem;color:rgba(248,250,252,.45);white-space:nowrap}
+        .tide-ctrl input{flex:1}
+        .tide-status{margin-top:.65rem;background:rgba(14,165,233,0.06);border:.5px solid rgba(14,165,233,0.15);border-radius:6px;padding:.5rem .8rem;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:.4rem}
+        .tide-status-label{font-family:'Inter Tight',sans-serif;font-size:.7rem;color:rgba(14,165,233,.7);text-transform:uppercase;letter-spacing:.07em}
+        .tide-status-val{font-family:'Inter Tight',sans-serif;font-size:.88rem;font-weight:500;color:#0ea5e9}
+        .tide-badge{font-family:'Inter Tight',sans-serif;font-size:.72rem;font-weight:500;padding:.18rem .55rem;border-radius:4px}
+        .tide-note{margin-top:.55rem;font-family:'Inter Tight',sans-serif;font-size:.68rem;color:rgba(248,250,252,.3);line-height:1.5}
+        .loc-list{display:flex;flex-direction:column;gap:.55rem}
+        .loc-item{display:flex;align-items:center;gap:.9rem;padding:.7rem 1rem;border-radius:8px;background:rgba(248,250,252,0.04);border:.5px solid rgba(100,116,139,0.2);transition:all .2s}
+        .loc-item:hover{background:rgba(14,165,233,0.08);border-color:rgba(14,165,233,0.3)}
+        .loc-dot{width:10px;height:10px;border-radius:50%;background:#0ea5e9;flex-shrink:0}
+        .loc-name{font-family:'Inter Tight',sans-serif;font-size:.83rem;color:#f8fafc;font-weight:500;flex:1}
+        .loc-type{font-family:'Inter Tight',sans-serif;font-size:.7rem;color:rgba(14,165,233,0.6);text-transform:uppercase;letter-spacing:.07em}
+        .loc-badge{font-family:'Inter Tight',sans-serif;font-size:.65rem;padding:.2rem .5rem;border-radius:3px;background:rgba(14,165,233,0.15);color:#0ea5e9}
+        .team-grid{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:.2rem}
+        .team-chip{font-family:'Inter Tight',sans-serif;font-size:.75rem;background:rgba(14,165,233,0.08);border:.5px solid rgba(14,165,233,0.2);padding:.35rem .75rem;border-radius:20px;color:rgba(248,250,252,.72)}
+        .mentor-row{display:flex;gap:.8rem;margin-top:1rem;flex-wrap:wrap}
+        .mentor-card{flex:1;min-width:160px;background:rgba(248,250,252,0.04);border:.5px solid rgba(14,165,233,0.2);border-radius:8px;padding:.8rem 1rem}
+        .mentor-role{font-family:'Inter Tight',sans-serif;font-size:.65rem;text-transform:uppercase;letter-spacing:.08em;color:#0ea5e9;opacity:.7;margin-bottom:.25rem}
+        .mentor-name{font-size:.88rem;font-weight:600;color:#f8fafc}
+        .funder-list{display:flex;flex-direction:column;gap:.5rem;margin-top:.5rem}
+        .funder-item{font-family:'Inter Tight',sans-serif;font-size:.8rem;color:rgba(248,250,252,.62);display:flex;align-items:center;gap:.6rem;padding:.5rem 0;border-bottom:.5px solid rgba(100,116,139,0.15)}
+        .funder-item:last-child{border-bottom:none}
+        .funder-icon{width:20px;height:20px;border-radius:50%;background:rgba(14,165,233,0.1);border:.5px solid rgba(14,165,233,0.25);flex-shrink:0}
+        .i-reveal{opacity:0;transform:translateY(16px);transition:opacity .6s ease,transform .6s ease}
+        .i-reveal.in{opacity:1;transform:translateY(0)}
+        </style>
+
+        <div id="infog">
+          <h2 class="sr-only">Central Coast Tide Gauge Project — interactive infographic</h2>
+          <div class="wave-bg" aria-hidden="true"><div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div></div>
+          <div class="particles" id="ptcls" aria-hidden="true"></div>
+
+          <nav class="scroll-nav" id="snav" aria-label="Infographic sections">
+            <button class="snav-btn active" onclick="scrollSec('s-intro')">Overview</button>
+            <button class="snav-btn" onclick="scrollSec('s-gauges')">Gauge types</button>
+            <button class="snav-btn" onclick="scrollSec('s-how')">How it works</button>
+            <button class="snav-btn" onclick="scrollSec('s-locs')">Locations</button>
+            <button class="snav-btn" onclick="scrollSec('s-team')">Team</button>
+          </nav>
+
+          <div class="i-panel i-reveal" id="s-intro">
+            <p class="sec-eyebrow">Introduction</p>
+            <p class="sec-title">Why we're measuring tides</p>
+            <p class="intro-text">NOAA gauges cost $25,000+ each and are spaced ~100 miles apart, leaving coastal communities without local data on sea level rise. CTIR builds low-cost gauges to fill those gaps — providing the resolution needed for real coastal planning.</p>
+            <div class="intro-goal-list">
+              <div class="goal-item"><div class="goal-dot"></div><span>Make modular, replicable, low-cost gauges</span></div>
+              <div class="goal-item"><div class="goal-dot"></div><span>Increase data resolution along the Central Coast</span></div>
+              <div class="goal-item"><div class="goal-dot"></div><span>Measure long-term sea level rise trends</span></div>
+              <div class="goal-item"><div class="goal-dot"></div><span>Understand tide patterns within an enclosed bay</span></div>
+            </div>
+          </div>
+
+          <div class="i-panel i-reveal" id="s-gauges">
+            <p class="sec-eyebrow">Gauge types</p>
+            <p class="sec-title">Three ways to measure the tide</p>
+            <div class="gauge-grid">
+              <div class="gauge-card active" id="gc-0" onclick="selectGauge(0)">
+                <svg class="gauge-icon" viewBox="0 0 44 44" fill="none"><rect x="18" y="4" width="8" height="22" rx="2" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.5)" stroke-width="1"/><line x1="22" y1="26" x2="22" y2="38" stroke="rgba(14,165,233,0.35)" stroke-width="1.5" stroke-dasharray="2 2"/><ellipse cx="22" cy="39" rx="5" ry="2.5" fill="rgba(14,165,233,0.2)" stroke="rgba(14,165,233,0.5)" stroke-width="1"/><circle cx="22" cy="12" r="3" fill="rgba(14,165,233,0.5)"/></svg>
+                <p class="g-num">01</p><p class="g-name">Ultrasonic</p><p class="g-desc">Sound waves measure distance to water surface</p>
+              </div>
+              <div class="gauge-card" id="gc-1" onclick="selectGauge(1)">
+                <svg class="gauge-icon" viewBox="0 0 44 44" fill="none"><rect x="16" y="4" width="12" height="10" rx="2" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.5)" stroke-width="1"/><path d="M22 14 L22 30" stroke="rgba(14,165,233,0.4)" stroke-width="1.5"/><path d="M14 32 Q22 26 30 32" stroke="rgba(14,165,233,0.5)" stroke-width="1" fill="none" stroke-dasharray="1.5 2"/><path d="M11 36 Q22 28 33 36" stroke="rgba(14,165,233,0.3)" stroke-width="1" fill="none" stroke-dasharray="1.5 2"/><ellipse cx="22" cy="40" rx="7" ry="2" fill="rgba(14,165,233,0.1)" stroke="rgba(14,165,233,0.3)" stroke-width="1"/></svg>
+                <p class="g-num">02</p><p class="g-name">Radar</p><p class="g-desc">Radio waves bounce off water for precision</p>
+              </div>
+              <div class="gauge-card" id="gc-2" onclick="selectGauge(2)">
+                <svg class="gauge-icon" viewBox="0 0 44 44" fill="none"><rect x="16" y="28" width="12" height="10" rx="2" fill="rgba(14,165,233,0.15)" stroke="rgba(14,165,233,0.5)" stroke-width="1"/><path d="M22 28 L22 12" stroke="rgba(14,165,233,0.4)" stroke-width="1.5" stroke-dasharray="2 2"/><ellipse cx="22" cy="10" rx="8" ry="5" fill="rgba(14,165,233,0.12)" stroke="rgba(14,165,233,0.4)" stroke-width="1"/><circle cx="22" cy="10" r="2" fill="rgba(14,165,233,0.55)"/></svg>
+                <p class="g-num">03</p><p class="g-name">Pressure</p><p class="g-desc">Submerged sensor reads water column weight</p>
+              </div>
+            </div>
+            <div class="gauge-detail visible" id="gd-0">
+              <p class="gd-title">Ultrasonic gauge</p>
+              <p class="gd-body">Emits sound waves downward and times their return from the water surface. Sensitive to temperature and humidity — corrections are an active area of improvement.</p>
+              <div class="gd-spec"><div class="gd-spec-item"><span>Type</span><strong>In-house build</strong></div><div class="gd-spec-item"><span>Locations</span><strong>Cayucos, San Simeon, Avila</strong></div><div class="gd-spec-item"><span>Limitation</span><strong>Temp/humidity drift</strong></div></div>
+            </div>
+            <div class="gauge-detail" id="gd-1">
+              <p class="gd-title">Radar gauge</p>
+              <p class="gd-body">Sends radio pulses to the water surface and measures return time. CTIR's in-house radar at Cal Poly Pier supports remote data collection over WiFi.</p>
+              <div class="gd-spec"><div class="gd-spec-item"><span>Type</span><strong>Commercial + in-house</strong></div><div class="gd-spec-item"><span>Locations</span><strong>Morro Bay, Cal Poly Pier</strong></div><div class="gd-spec-item"><span>Advantage</span><strong>Remote data access</strong></div></div>
+            </div>
+            <div class="gauge-detail" id="gd-2">
+              <p class="gd-title">Pressure gauge (HOBO)</p>
+              <p class="gd-body">A submerged sensor measures how much water is pressing down on it — more water = higher tide. Compact and easy to deploy in estuaries and bays.</p>
+              <div class="gd-spec"><div class="gd-spec-item"><span>Type</span><strong>HOBO (commercial)</strong></div><div class="gd-spec-item"><span>Locations</span><strong>Los Osos, Chorro Creek</strong></div><div class="gd-spec-item"><span>Advantage</span><strong>Compact, submerged</strong></div></div>
+            </div>
+          </div>
+
+          <div class="i-panel i-reveal" id="s-how">
+            <p class="sec-eyebrow">How it works</p>
+            <p class="sec-title">Distance = speed × time</p>
+            <div class="hw-diagram">
+              <div class="hw-step"><div class="hw-step-num">1</div><div class="hw-step-text"><strong>Signal emitted</strong>The gauge sends a sound or radio wave downward toward the water surface.</div></div>
+              <div class="hw-arrow-down"></div>
+              <div class="hw-step"><div class="hw-step-num">2</div><div class="hw-step-text"><strong>Wave reflects</strong>The signal bounces off the water surface and returns to the sensor.</div></div>
+              <div class="hw-arrow-down"></div>
+              <div class="hw-step"><div class="hw-step-num">3</div><div class="hw-step-text"><strong>Time measured</strong>The gauge records exactly how long the round trip took.</div></div>
+              <div class="hw-arrow-down"></div>
+              <div class="hw-step"><div class="hw-step-num">4</div><div class="hw-step-text"><strong>Distance calculated</strong>Distance = Speed × Time ÷ 2. That distance tells us the water level.</div></div>
+            </div>
+            <div class="formula-box"><p>Key formula</p><code>Distance = Speed × Time / 2</code></div>
+            <p class="sec-eyebrow" style="margin-top:2rem">Why it matters</p>
+            <p class="sec-title" style="margin-bottom:.8rem">See the impact at Toro Creek Bridge</p>
+            <div class="tide-wrap">
+              <canvas id="tide-canvas" aria-label="Toro Creek Bridge sea level rise simulation"></canvas>
+            </div>
+            <div class="tide-ctrl">
+              <label for="tide-slider">Sea level rise</label>
+              <input type="range" id="tide-slider" min="0" max="100" value="0" step="1" aria-label="Sea level rise slider">
+            </div>
+            <div class="tide-status">
+              <span class="tide-status-label">Rise amount</span>
+              <span class="tide-status-val" id="tide-val">+0.0 m</span>
+              <span class="tide-badge" id="tide-badge" style="background:rgba(14,165,233,0.12);color:#0ea5e9">Normal conditions</span>
+            </div>
+            <p class="tide-note">Toro Creek Bridge, Hwy 1 — between Morro Bay &amp; Cayucos. The northbound span was rebuilt in 2023 with a raised deck. The southbound span replacement began April 2026.</p>
+          </div>
+
+          <div class="i-panel i-reveal" id="s-locs">
+            <p class="sec-eyebrow">Active deployment locations</p>
+            <p class="sec-title">Where we're collecting data now</p>
+            <div class="loc-list" id="loc-list"></div>
+          </div>
+
+          <div class="i-panel i-reveal" id="s-team" style="padding-bottom:3rem">
+            <p class="sec-eyebrow">The team</p>
+            <p class="sec-title">Cal Poly mentors &amp; funders</p>
+            <div class="mentor-row">
+              <div class="mentor-card"><p class="mentor-role">Lead faculty</p><p class="mentor-name">Prof. Stefan A. Talke</p></div>
+              <div class="mentor-card"><p class="mentor-role">Physical oceanographer</p><p class="mentor-name">Dr. Serena B. Lee</p></div>
+            </div>
+            <p style="font-family:'Inter Tight',sans-serif;font-size:.8rem;color:rgba(248,250,252,.5);margin-top:1.2rem;margin-bottom:.6rem">Funded by</p>
+            <div class="funder-list">
+              <div class="funder-item"><div class="funder-icon"></div>Santa Rosa Creek Foundation</div>
+              <div class="funder-item"><div class="funder-icon"></div>College of Engineering SURP Program</div>
+              <div class="funder-item"><div class="funder-icon"></div>Baker-Koob Foundation</div>
+            </div>
+          </div>
+        </div>
+        <!-- ── END INFOGRAPHIC ── -->
+    </section>
+
+    <!-- ══════════════════════════════════════
+         MAP SECTION
+    ══════════════════════════════════════ -->
+    <section id="map-section">
+        <span class="sec-label">Where We Work</span>
+        <h2>From Morro Bay to Cal Poly Pier</h2>
+        <p class="intro">Here's where the data actually comes from. Click any marker to learn about that gauge location.</p>
+        <div id="ctir-map"></div>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         CLOSING
+    ══════════════════════════════════════ -->
+    <section id="closing">
+        <span class="eyebrow">Looking Ahead</span>
+        <h2>Sea Level Rise Isn't Going Away.</h2>
+        <p>This isn't something that's going to lessen, or go back to the way it was a decade ago. Our coastlines are actively changing, so we must change too. Collecting information about tides may seem mundane, but it's what will help us fight beach loss, save our homes, and continue living in the places we love and want to protect.</p>
+        <p class="pull-dark">Our coastlines are actively changing,<br>so we must change too.</p>
+        <p>Want to learn more about the students making this happen?</p>
+        <a class="about-link" href="about.html">Meet the team →</a>
+    </section>
+
+    <!-- ══════════════════════════════════════
+         NEWS
+    ══════════════════════════════════════ -->
+    <section id="news-section">
+        <span class="sec-label">In the News</span>
+        <h2>Read About Us</h2>
+        <div class="news-grid">
+            <a href="https://kcpr.org/cal-poly-and-central-coast-team-up/" class="news-card" target="_blank">
+                <div class="news-card-img" style="background-image: url('img/KCPRarticle.jpg')"></div>
+                <div class="news-card-body">
+                    <p>Cal Poly and Central Coast team up to tackle sea level rise through King Tides project</p>
+                    <span class="news-source">KCPR</span>
+                </div>
+            </a>
+            <a href="https://ceng.calpoly.edu/connection/2024/02/surfing-the-tide-of-change-how-an-australian-oceanographer-is-making-waves-in-environmental-science/" class="news-card" target="_blank">
+                <div class="news-card-img" style="background-image: url('img/CENGarticle.jpg')"></div>
+                <div class="news-card-body">
+                    <p>Surfing the Tide of Change: How an Australian Oceanographer is Making Waves in Environmental Science</p>
+                    <span class="news-source">Cal Poly Engineering</span>
+                </div>
+            </a>
+            <a href="https://digitalcommons.calpoly.edu/cgi/viewcontent.cgi?article=4313&context=theses" class="news-card" target="_blank">
+                <div class="news-card-img" style="background-image: url('img/Dunnthesis.jpg')"></div>
+                <div class="news-card-body">
+                    <p>Development of a Low Cost Acoustic Gauge for Simultaneous Tide and Wave Measurement</p>
+                    <span class="news-source">Alex Dunn — Senior Thesis 2023</span>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <footer id="footer">
+        <p>CTIR | By Ayla Boose | May 2026</p>
+        <p><a href="mailto:aylaboose@gmail.com">aylaboose@gmail.com</a></p>
+    </footer>
+
+    <button id="back-to-top" title="Back to top">&#8593; Top</button>
+
+    <!-- ══════════════════════════════════════
+         SCRIPTS
+    ══════════════════════════════════════ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+    <script src="script.js"></script>
+
+    <script>
+    /* ─── SCROLL PROGRESS & BACK TO TOP ─── */
+    (function(){
+        const bar = document.getElementById('scroll-progress');
+        const btn = document.getElementById('back-to-top');
+        window.addEventListener('scroll', function(){
+            const scrollY = window.scrollY;
+            const docH = document.documentElement.scrollHeight - window.innerHeight;
+            bar.style.width = ((scrollY / docH) * 100) + '%';
+            btn.classList.toggle('visible', scrollY > 400);
+        }, {passive: true});
+        btn.addEventListener('click', () => window.scrollTo({top: 0, behavior: 'smooth'}));
+    })();
+
+    /* ─── SCROLLYTELLING COAST MAP ─── */
+    (function(){
+        const steps = document.querySelectorAll('.scrolly-step');
+
+        // Elements to animate on each step
+        const stepActions = [
+            function(){ /* step 0: base state */ },
+            function(){
+                // Show the gap line
+                document.getElementById('gap-line').setAttribute('opacity', '1');
+                document.getElementById('gap-label-box').setAttribute('opacity', '1');
+                document.getElementById('gap-label-text').setAttribute('opacity', '1');
+            },
+            function(){
+                // Show CTIR dots
+                ['ctir-mb1','ctir-mb2','ctir-lososos','ctir-pier'].forEach(function(id, i){
+                    setTimeout(function(){
+                        const el = document.getElementById(id);
+                        if(el) el.classList.remove('hidden');
+                    }, i * 120);
+                });
+                document.getElementById('lbl-mb').classList.add('shown');
+                document.getElementById('lbl-pier').classList.add('shown');
+            }
+        ];
+        let lastStep = -1;
+
+        const obs = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){
+                if(e.isIntersecting){
+                    const idx = parseInt(e.target.dataset.step);
+                    steps.forEach(function(s){ s.classList.remove('active'); });
+                    e.target.classList.add('active');
+                    if(idx !== lastStep){
+                        lastStep = idx;
+                        for(let i = 0; i <= idx; i++){
+                            if(stepActions[i]) stepActions[i]();
+                        }
+                    }
+                }
+            });
+        }, {threshold: 0.5, rootMargin: '-10% 0px -40% 0px'});
+
+        steps.forEach(function(s){ obs.observe(s); });
+    })();
+
+    /* ─── AUDIO PLAYERS (DARK) ─── */
+    (function(){
+        const BAR_COUNT = 28;
+        let apCurrent = null;
+        const apFrames = {};
+
+        [1,2,3].forEach(function(n){
+            const wave = document.getElementById('ap-wave-' + n);
+            if(!wave) return;
+            for(let i = 0; i < BAR_COUNT; i++){
+                const b = document.createElement('div');
+                b.className = 'ap-bar';
+                wave.appendChild(b);
+            }
+        });
+
+        function apAnimateBars(n){
+            const bars = document.querySelectorAll('#ap-wave-' + n + ' .ap-bar');
+            const audio = document.getElementById('ap-audio-' + n);
+            function frame(){
+                if(!audio || audio.paused){ bars.forEach(b => b.style.height='4px'); return; }
+                bars.forEach(function(b, i){
+                    const h = 4 + Math.random() * 30 * Math.abs(Math.sin(Date.now() * 0.003 + i * 0.6));
+                    b.style.height = Math.round(h) + 'px';
+                });
+                apFrames[n] = requestAnimationFrame(frame);
+            }
+            cancelAnimationFrame(apFrames[n]);
+            apFrames[n] = requestAnimationFrame(frame);
+        }
+
+        function apUpdateProgress(n){
+            const audio = document.getElementById('ap-audio-' + n);
+            if(!audio || !audio.duration) return;
+            const pct = (audio.currentTime / audio.duration) * 100;
+            const fill = document.getElementById('ap-prog-' + n);
+            const thumb = document.getElementById('ap-thumb-' + n);
+            if(fill) fill.style.width = pct + '%';
+            if(thumb) thumb.style.left = pct + '%';
+            const m = Math.floor(audio.currentTime / 60);
+            const s = Math.floor(audio.currentTime % 60).toString().padStart(2,'0');
+            const timeEl = document.getElementById('ap-time-' + n);
+            if(timeEl) timeEl.textContent = m + ':' + s;
+            if(!audio.paused) requestAnimationFrame(function(){ apUpdateProgress(n); });
+        }
+
+        function apSetIcon(n, playing){
+            const btn = document.getElementById('ap-btn-' + n);
+            if(!btn) return;
+            btn.innerHTML = playing
+                ? '<svg viewBox="0 0 16 16" style="width:13px;height:13px;fill:#0f172a"><rect x="3" y="2" width="4" height="12"/><rect x="9" y="2" width="4" height="12"/></svg>'
+                : '<svg viewBox="0 0 16 16" style="width:13px;height:13px;fill:#0f172a"><path d="M4 2l10 6-10 6z"/></svg>';
+        }
+
+        window.apToggle = function(n){
+            const audio = document.getElementById('ap-audio-' + n);
+            const card = document.getElementById('ap-card-' + n);
+            if(!audio) return;
+            if(apCurrent && apCurrent !== n){
+                const prev = document.getElementById('ap-audio-' + apCurrent);
+                if(prev){ prev.pause(); prev.currentTime = 0; }
+                const prevCard = document.getElementById('ap-card-' + apCurrent);
+                if(prevCard) prevCard.classList.remove('playing');
+                apSetIcon(apCurrent, false);
+                const pf = document.getElementById('ap-prog-' + apCurrent);
+                const pt = document.getElementById('ap-time-' + apCurrent);
+                if(pf) pf.style.width = '0%';
+                if(pt) pt.textContent = '0:00';
+            }
+            if(audio.paused){
+                audio.play();
+                card.classList.add('playing');
+                apSetIcon(n, true);
+                apCurrent = n;
+                apAnimateBars(n);
+                apUpdateProgress(n);
+            } else {
+                audio.pause();
+                card.classList.remove('playing');
+                apSetIcon(n, false);
+                apCurrent = null;
+            }
+        };
+
+        window.apSeek = function(n, e){
+            const audio = document.getElementById('ap-audio-' + n);
+            if(!audio || !audio.duration) return;
+            const wrap = document.getElementById('ap-prog-wrap-' + n);
+            const rect = wrap.getBoundingClientRect();
+            audio.currentTime = ((e.clientX - rect.left) / rect.width) * audio.duration;
+            apUpdateProgress(n);
+        };
+
+        [1,2,3].forEach(function(n){
+            const audio = document.getElementById('ap-audio-' + n);
+            if(audio){
+                audio.addEventListener('ended', function(){
+                    const card = document.getElementById('ap-card-' + n);
+                    if(card) card.classList.remove('playing');
+                    apSetIcon(n, false);
+                    const pf = document.getElementById('ap-prog-' + n);
+                    const th = document.getElementById('ap-thumb-' + n);
+                    const pt = document.getElementById('ap-time-' + n);
+                    if(pf) pf.style.width = '0%';
+                    if(th) th.style.left = '0%';
+                    if(pt) pt.textContent = '0:00';
+                    apCurrent = null;
+                });
+            }
+        });
+    })();
+
+    /* ─── PHOTO ESSAY (HORIZONTAL SCROLL) ─── */
+    (function(){
+        const outer = document.getElementById('hg-outer');
+        const sticky = document.getElementById('hg-sticky');
+        const track = document.getElementById('hg-track');
+        const fill = document.getElementById('hg-fill');
+        const slides = document.querySelectorAll('.hg-slide');
+        const canvas = document.getElementById('hg-canvas');
+        const ctx = canvas.getContext('2d');
+        let waveT = 0, W = 0, H = 0;
+
+        function resize(){
+            W = canvas.width = sticky.clientWidth;
+            H = canvas.height = sticky.clientHeight;
+        }
+        resize();
+        window.addEventListener('resize', function(){ resize(); updateScroll(); });
+
+        function drawWaves(){
+            ctx.clearRect(0,0,W,H);
+            ctx.fillStyle = '#060d1a';
+            ctx.fillRect(0,0,W,H);
+            const layers = [
+                {amp:20,freq:0.010,speed:0.55,alpha:0.07,yf:0.52},
+                {amp:14,freq:0.016,speed:0.85,alpha:0.055,yf:0.60},
+                {amp:24,freq:0.007,speed:0.38,alpha:0.045,yf:0.44},
+                {amp:9, freq:0.023,speed:1.05,alpha:0.04,yf:0.68},
+                {amp:16,freq:0.013,speed:0.65,alpha:0.05,yf:0.38},
+            ];
+            layers.forEach(function(l){
+                const by = H * l.yf;
+                ctx.beginPath(); ctx.moveTo(0, by);
+                for(let x = 0; x <= W; x += 3){
+                    const y = by + Math.sin(x*l.freq+waveT*l.speed)*l.amp + Math.sin(x*l.freq*1.8-waveT*l.speed*0.5)*l.amp*0.35;
+                    ctx.lineTo(x, y);
+                }
+                ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath();
+                const g = ctx.createLinearGradient(0, by-l.amp, 0, by+l.amp*2);
+                g.addColorStop(0, 'rgba(14,165,233,'+(l.alpha*1.5)+')');
+                g.addColorStop(0.5, 'rgba(14,165,233,'+l.alpha+')');
+                g.addColorStop(1, 'rgba(6,13,26,0)');
+                ctx.fillStyle = g; ctx.fill();
+            });
+            for(let i = 0; i < 7; i++){
+                const sx = ((waveT*16+i*W/6) % (W+50)) - 25;
+                const sy = H*(0.42+i*0.04) + Math.sin(waveT*0.7+i*1.3)*10;
+                const sg = ctx.createRadialGradient(sx,sy,0,sx,sy,7);
+                sg.addColorStop(0,'rgba(248,250,252,0.06)'); sg.addColorStop(1,'rgba(248,250,252,0)');
+                ctx.fillStyle = sg; ctx.beginPath(); ctx.arc(sx,sy,7,0,Math.PI*2); ctx.fill();
+            }
+            waveT += 0.020;
+            requestAnimationFrame(drawWaves);
+        }
+        drawWaves();
+
+        function updateScroll(){
+            const outerRect = outer.getBoundingClientRect();
+            const totalScroll = outer.offsetHeight - window.innerHeight;
+            const scrolled = Math.max(0, -outerRect.top);
+            const pct = Math.min(1, scrolled / totalScroll);
+            const trackW = track.scrollWidth;
+            const viewW = track.parentElement.clientWidth;
+            const maxX = Math.max(0, trackW - viewW + window.innerWidth * 0.08);
+            track.style.transform = 'translateX(-' + (pct * maxX) + 'px)';
+            fill.style.width = (pct * 100) + '%';
+            const activeIndex = Math.round(pct * (slides.length - 1));
+            slides.forEach(function(s, i){
+                s.classList.toggle('vis', Math.abs(i - activeIndex) <= 1);
+            });
+        }
+        window.addEventListener('scroll', updateScroll, {passive: true});
+        updateScroll();
+    })();
+
+    /* ─── INFOGRAPHIC JS ─── */
+    (function(){
+        const locations = [
+            {name:"Morro Bay", type:"Radar gauge (commercial)"},
+            {name:"Cal Poly Pier", type:"Radar gauge (in-house, remote)"},
+            {name:"Coast Guard Pier", type:"Ultrasonic gauge"},
+            {name:"Chorro Creek Delta", type:"HOBO pressure gauge"},
+        ];
+        const ll = document.getElementById('loc-list');
+        if(ll) locations.forEach(function(l){
+            ll.innerHTML += '<div class="loc-item"><div class="loc-dot"></div><div style="flex:1"><div class="loc-name">'+l.name+'</div><div class="loc-type">'+l.type+'</div></div><span class="loc-badge">Active</span></div>';
+        });
+
+        window.selectGauge = function(i){
+            [0,1,2].forEach(function(n){
+                const gc = document.getElementById('gc-'+n);
+                const gd = document.getElementById('gd-'+n);
+                if(gc) gc.classList.toggle('active', n===i);
+                if(gd){ gd.style.display = n===i ? 'block' : 'none'; gd.classList.toggle('visible', n===i); }
+            });
+        };
+        const gd1 = document.getElementById('gd-1');
+        const gd2 = document.getElementById('gd-2');
+        if(gd1) gd1.style.display = 'none';
+        if(gd2) gd2.style.display = 'none';
+
+        window.scrollSec = function(id){
+            const el = document.getElementById(id);
+            if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+            const ids = ['s-intro','s-gauges','s-how','s-locs','s-team'];
+            document.querySelectorAll('.snav-btn').forEach(function(b,i){ b.classList.toggle('active', ids[i]===id); });
+        };
+
+        const ptcls = document.getElementById('ptcls');
+        if(ptcls){
+            for(let i = 0; i < 12; i++){
+                const d = document.createElement('div'); d.className = 'dot';
+                const sz = 2 + Math.random() * 3;
+                d.style.cssText = 'width:'+sz+'px;height:'+sz+'px;left:'+Math.random()*100+'%;bottom:0;animation-duration:'+(6+Math.random()*10)+'s;animation-delay:'+Math.random()*8+'s';
+                ptcls.appendChild(d);
+            }
+        }
+
+        const iRevealObs = new IntersectionObserver(function(entries){
+            entries.forEach(function(e){ if(e.isIntersecting) e.target.classList.add('in'); });
+        }, {threshold: .1});
+        document.querySelectorAll('.i-reveal').forEach(function(el){ iRevealObs.observe(el); });
+
+        /* Toro Creek canvas */
+        const canvas = document.getElementById('tide-canvas');
+        if(!canvas) return;
+        const ctx = canvas.getContext('2d');
+        const slider = document.getElementById('tide-slider');
+        const valEl = document.getElementById('tide-val');
+        const badgeEl = document.getElementById('tide-badge');
+
+        function resizeCanvas(){
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 220;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        let waveT = 0, animPct = 0, targetPct = 0;
+
+        function draw(pct){
+            const W=canvas.width, H=canvas.height;
+            ctx.clearRect(0,0,W,H);
+            const creekBed=H*0.74, bankTopL=H*0.60, bankTopR=H*0.60;
+            const roadDeck=H*0.44, deckThick=12;
+            const spanL=W*0.28, spanR=W*0.72;
+            const waterY=creekBed-pct*(H*0.52);
+            const rise=pct*2.5;
+
+            ctx.fillStyle='#060d1a'; ctx.fillRect(0,0,W,H);
+
+            const lg1=ctx.createLinearGradient(0,0,0,bankTopL);
+            lg1.addColorStop(0,'#1a2e1a'); lg1.addColorStop(1,'#2a4a2a');
+            ctx.fillStyle=lg1;
+            ctx.beginPath(); ctx.moveTo(0,H); ctx.lineTo(0,bankTopL+20);
+            ctx.bezierCurveTo(W*0.08,bankTopL-30,W*0.18,bankTopL+10,spanL,bankTopL+5);
+            ctx.lineTo(spanL,H); ctx.closePath(); ctx.fill();
+            ctx.fillStyle='#3a5a3a';
+            ctx.beginPath(); ctx.moveTo(0,bankTopL+20);
+            ctx.bezierCurveTo(W*0.08,bankTopL-30,W*0.18,bankTopL+10,spanL,bankTopL+5);
+            ctx.lineTo(spanL,bankTopL+18); ctx.lineTo(0,bankTopL+18); ctx.closePath(); ctx.fill();
+
+            const lg2=ctx.createLinearGradient(0,0,0,bankTopR);
+            lg2.addColorStop(0,'#1a2e1a'); lg2.addColorStop(1,'#2a4a2a');
+            ctx.fillStyle=lg2;
+            ctx.beginPath(); ctx.moveTo(W,H); ctx.lineTo(W,bankTopR+15);
+            ctx.bezierCurveTo(W*0.92,bankTopR-20,W*0.82,bankTopR+10,spanR,bankTopR+5);
+            ctx.lineTo(spanR,H); ctx.closePath(); ctx.fill();
+            ctx.fillStyle='#3a5a3a';
+            ctx.beginPath(); ctx.moveTo(W,bankTopR+15);
+            ctx.bezierCurveTo(W*0.92,bankTopR-20,W*0.82,bankTopR+10,spanR,bankTopR+5);
+            ctx.lineTo(spanR,bankTopR+18); ctx.lineTo(W,bankTopR+18); ctx.closePath(); ctx.fill();
+
+            if(waterY<H){
+                const flooded=waterY<bankTopL;
+                ctx.save();
+                ctx.beginPath(); ctx.moveTo(0,waterY);
+                for(let x=0;x<=W;x+=3){ ctx.lineTo(x,waterY+Math.sin(x*0.04+waveT)*2.2+Math.sin(x*0.025-waveT*0.8)*1.5); }
+                ctx.lineTo(W,H); ctx.lineTo(0,H); ctx.closePath(); ctx.clip();
+                const wg=ctx.createLinearGradient(0,waterY,0,H);
+                if(flooded){wg.addColorStop(0,'rgba(180,40,40,0.65)');wg.addColorStop(0.35,'rgba(14,100,180,0.72)');wg.addColorStop(1,'rgba(7,50,100,0.95)');}
+                else{wg.addColorStop(0,'rgba(14,165,233,0.72)');wg.addColorStop(0.5,'rgba(10,90,160,0.82)');wg.addColorStop(1,'rgba(7,50,100,0.95)');}
+                ctx.fillStyle=wg; ctx.fillRect(0,waterY,W,H-waterY);
+                ctx.restore();
+                if(!flooded){
+                    ctx.fillStyle=lg1;
+                    ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(0,bankTopL+20);ctx.bezierCurveTo(W*0.08,bankTopL-30,W*0.18,bankTopL+10,spanL,bankTopL+5);ctx.lineTo(spanL,H);ctx.closePath();ctx.fill();
+                    ctx.fillStyle=lg2;
+                    ctx.beginPath();ctx.moveTo(W,H);ctx.lineTo(W,bankTopR+15);ctx.bezierCurveTo(W*0.92,bankTopR-20,W*0.82,bankTopR+10,spanR,bankTopR+5);ctx.lineTo(spanR,H);ctx.closePath();ctx.fill();
+                }
+            }
+
+            const pierColor=pct>0.45?'#7a5555':'#7a7a8a';
+            [W*0.37,W*0.50,W*0.63].forEach(function(px){
+                ctx.fillStyle=pierColor;
+                ctx.fillRect(px-6,roadDeck+deckThick,12,creekBed-roadDeck-deckThick);
+                ctx.fillStyle='#5a5a6a'; ctx.fillRect(px-9,roadDeck+deckThick,18,8);
+            });
+
+            ctx.fillStyle='#5a5a6a'; ctx.fillRect(0,roadDeck,spanL,deckThick); ctx.fillRect(spanR,roadDeck,W-spanR,deckThick);
+            ctx.fillStyle='#6a6a7a'; ctx.fillRect(spanL,roadDeck,spanR-spanL,deckThick);
+            ctx.fillStyle='#c8b87a'; ctx.fillRect(0,roadDeck,spanL,2.5); ctx.fillRect(spanR,roadDeck,W-spanR,2.5); ctx.fillRect(spanL,roadDeck,spanR-spanL,2.5);
+            ctx.fillStyle='#aaaabc'; ctx.fillRect(0,roadDeck-10,W,2);
+            for(let rx=6;rx<W;rx+=18){ ctx.fillStyle='rgba(160,160,180,0.65)'; ctx.fillRect(rx,roadDeck-10,1.5,10); }
+
+            const thresholds=[
+                {pct:0,y:creekBed,label:'Creek bed (normal)',col:'14,165,233'},
+                {pct:0.25,y:creekBed-H*0.52*0.25,label:'+0.6 m — banks overflow',col:'245,158,11'},
+                {pct:0.50,y:creekBed-H*0.52*0.50,label:'+1.25 m — Hwy 1 floods',col:'239,68,68'},
+                {pct:0.80,y:creekBed-H*0.52*0.80,label:'+2.0 m — bridge deck',col:'220,38,38'},
+            ];
+            thresholds.forEach(function(th){
+                const alpha=Math.max(0,1-Math.abs(pct-th.pct)*3.8);
+                if(alpha<0.05) return;
+                ctx.strokeStyle='rgba('+th.col+','+alpha*0.4+')'; ctx.lineWidth=.5; ctx.setLineDash([3,6]);
+                ctx.beginPath(); ctx.moveTo(spanR+4,th.y); ctx.lineTo(W*0.97,th.y); ctx.stroke(); ctx.setLineDash([]);
+                ctx.fillStyle='rgba(248,250,252,'+alpha*0.75+')'; ctx.font='500 10px Inter Tight,sans-serif'; ctx.textAlign='left';
+                ctx.fillText(th.label,spanR+7,th.y-4);
+            });
+
+            ctx.fillStyle='rgba(248,250,252,0.5)'; ctx.font='500 11px Inter Tight,sans-serif'; ctx.textAlign='center';
+            ctx.fillText('Toro Creek Bridge — Hwy 1',W/2,roadDeck-20);
+            ctx.fillStyle='rgba(248,250,252,0.28)'; ctx.font='10px Inter Tight,sans-serif';
+            ctx.textAlign='left'; ctx.fillText('↑ Cayucos',6,roadDeck+26);
+            ctx.textAlign='right'; ctx.fillText('Morro Bay ↑',W-6,roadDeck+26);
+
+            if(pct<0.28){
+                ctx.fillStyle='#b83232'; ctx.beginPath(); ctx.roundRect(W*0.33,roadDeck-10,20,8,2); ctx.fill();
+                ctx.fillStyle='#2471a3'; ctx.beginPath(); ctx.roundRect(W*0.57,roadDeck-10,24,8,2); ctx.fill();
+            } else if(pct>=0.28 && pct<0.65){
+                ctx.fillStyle='rgba(245,158,11,0.85)'; ctx.font='500 9px Inter Tight,sans-serif'; ctx.textAlign='center';
+                ctx.fillText('⚠ flooding — road closed',W/2,roadDeck-16);
+            }
+
+            valEl.textContent = '+'+rise.toFixed(2)+' m';
+            if(pct<0.08){badgeEl.textContent='Normal conditions';badgeEl.style.background='rgba(14,165,233,0.12)';badgeEl.style.color='#0ea5e9';}
+            else if(pct<0.3){badgeEl.textContent='Creek rising';badgeEl.style.background='rgba(245,158,11,0.12)';badgeEl.style.color='#f59e0b';}
+            else if(pct<0.55){badgeEl.textContent='Banks overflowing';badgeEl.style.background='rgba(239,68,68,0.15)';badgeEl.style.color='#ef4444';}
+            else if(pct<0.82){badgeEl.textContent='Hwy 1 flooded';badgeEl.style.background='rgba(185,28,28,0.2)';badgeEl.style.color='#fca5a5';}
+            else{badgeEl.textContent='Bridge deck reached';badgeEl.style.background='rgba(120,0,0,0.3)';badgeEl.style.color='#fca5a5';}
+        }
+
+        function tick(){ waveT+=0.038; animPct+=(targetPct-animPct)*0.055; draw(animPct); requestAnimationFrame(tick); }
+        tick();
+        if(slider) slider.addEventListener('input', function(){ targetPct = parseInt(this.value)/100; });
+    })();
+
+    /* ─── LEAFLET MAP ─── */
+    (function(){
+        const map = L.map('ctir-map', {center:[35.30,-120.82], zoom:11, scrollWheelZoom:false});
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',{
+            attribution:'Tiles &copy; Esri', maxZoom:19
+        }).addTo(map);
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',{
+            maxZoom:19, opacity:0.7
+        }).addTo(map);
+        const ctirIcon = L.icon({iconUrl:'img/CTIRstamp.png', iconSize:[44,44], iconAnchor:[22,22], popupAnchor:[0,-24]});
+        const locations = [
+            {lat:35.33656,lng:-120.82328,name:'Los Osos Creek',type:'HOBO pressure gauge monitoring tidal fluctuations in the Los Osos estuary.',gauge:'HOBO Pressure Gauge'},
+            {lat:35.37063,lng:-120.85821,name:'Morro Bay Coast Guard Pier',type:'Ultrasonic gauge deployed at the Coast Guard station, capturing open bay tidal data.',gauge:'Ultrasonic Gauge'},
+            {lat:35.35614,lng:-120.84799,name:'Morro Bay Bayfront Marina',type:'Radar gauge measuring water levels along the Morro Bay Embarcadero.',gauge:'Radar Gauge'},
+            {lat:35.34519,lng:-120.84052,name:'Morro Bay State Park Marina',type:'Gauge station capturing tidal data within the sheltered State Park marina.',gauge:'Radar Gauge'},
+            {lat:35.17021,lng:-120.74094,name:'Cal Poly Pier',type:'In-house radar gauge with remote WiFi data collection — deployed May 2025.',gauge:'Radar Gauge (Remote)'},
+        ];
+        locations.forEach(function(loc){
+            const popup = L.popup({className:'ctir-popup', maxWidth:240, minWidth:220}).setContent(
+                '<div class="popup-inner"><p class="popup-eyebrow">Active Gauge</p><p class="popup-name">'+loc.name+'</p><p class="popup-type">'+loc.type+'</p><span class="popup-badge"><span class="popup-dot"></span>'+loc.gauge+'</span></div>'
+            );
+            L.marker([loc.lat,loc.lng],{icon:ctirIcon}).addTo(map).bindPopup(popup);
+        });
+        map.on('focus', function(){ map.scrollWheelZoom.enable(); });
+        map.on('blur', function(){ map.scrollWheelZoom.disable(); });
+    })();
+    </script>
+</body>
+</html>
